@@ -25,9 +25,10 @@ contract CertificateNFT is ERC721Enumerable, AccessControl, Ownable {
     constructor() ERC721("CertificateNFT", "CERNFT") Ownable(msg.sender) {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
-        _tokenIdCounter.increment(); // Ensure we start token IDs from 1
+        _tokenIdCounter.increment(); 
     }
-
+    
+    // Mint to the specified recipient's address
     function mintCertificate(
         address recipient, 
         string memory name,
@@ -43,7 +44,7 @@ contract CertificateNFT is ERC721Enumerable, AccessControl, Ownable {
         uint256 newTokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
 
-        _safeMint(recipient, newTokenId); // Mint to the specified recipient's address
+        _safeMint(recipient, newTokenId); 
         _certificates[newTokenId] = Certificate(name, course, date, cerType, imageUri);
         return newTokenId;
     }
@@ -60,7 +61,6 @@ contract CertificateNFT is ERC721Enumerable, AccessControl, Ownable {
             string memory
         )
     {
-        // Ensure the token exists
         try this.ownerOf(tokenId) returns (address) {
             Certificate memory cert = _certificates[tokenId];
             return (cert.name, cert.course, cert.date, cert.cerType, cert.imageUri);
