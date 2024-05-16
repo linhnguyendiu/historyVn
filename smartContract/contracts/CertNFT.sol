@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -15,7 +15,7 @@ contract CertificateNFT is ERC721Enumerable, AccessControl, Ownable {
     struct Certificate {
         string name;
         string course;
-        string date;
+        uint256 date;
         string cerType;
         string imageUri;
     }
@@ -25,15 +25,14 @@ contract CertificateNFT is ERC721Enumerable, AccessControl, Ownable {
     constructor() ERC721("CertificateNFT", "CERNFT") Ownable(msg.sender) {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
-        _tokenIdCounter.increment(); 
+        _tokenIdCounter.increment(); // Ensure we start token IDs from 1
     }
-    
-    // Mint to the specified recipient's address
+
     function mintCertificate(
         address recipient, 
         string memory name,
         string memory course,
-        string memory date,
+        uint256 date,
         string memory cerType,
         string memory imageUri
     )
@@ -44,7 +43,7 @@ contract CertificateNFT is ERC721Enumerable, AccessControl, Ownable {
         uint256 newTokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
 
-        _safeMint(recipient, newTokenId); 
+        _safeMint(recipient, newTokenId); // Mint to the specified recipient's address
         _certificates[newTokenId] = Certificate(name, course, date, cerType, imageUri);
         return newTokenId;
     }
@@ -56,11 +55,12 @@ contract CertificateNFT is ERC721Enumerable, AccessControl, Ownable {
         returns (
             string memory,
             string memory,
-            string memory,
+            uint256,
             string memory,
             string memory
         )
     {
+        // Ensure the token exists
         try this.ownerOf(tokenId) returns (address) {
             Certificate memory cert = _certificates[tokenId];
             return (cert.name, cert.course, cert.date, cert.cerType, cert.imageUri);
