@@ -1,0 +1,8 @@
+.footer-details {
+    display: flex;
+    justify-content: space-around;
+}
+.footer-details .col { 
+    display: flex;
+    flex-direction: column;
+}
