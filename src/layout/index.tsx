@@ -7,38 +7,45 @@ import {
   PhoneFilled,
   MailFilled,
 } from "@ant-design/icons";
-import { Outlet, useNavigate } from "react-router-dom"
+import { Outlet, useNavigate } from "react-router-dom";
 
 import "./index.css";
 const { Header, Content, Footer } = Layout;
 const { Text, Title } = Typography;
-const items = [
-  {
-    key: 1,
-    label: "Trang chủ",
-  },
-  {
-    key: 2,
-    label: "Khóa học",
-  },
-  {
-    key: 3,
-    label: "Chia sẻ",
-  },
-  {
-    key: 4,
-    label: "Bảng xếp hạng",
-  },
-  {
-    key: 5,
-    label: "Về tôi",
-  },
-];
 
 const App: React.FC = () => {
+  const navigate = useNavigate();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  const items = [
+    {
+      key: 1,
+      label: "Trang chủ",
+      onClick: () => navigate('/')
+    },
+    {
+      key: 2,
+      label: "Khóa học",
+      onClick: () => navigate('/course')
+    },
+    {
+      key: 3,
+      label: "Chia sẻ",
+      onClick: () => navigate('/share')
+    },
+    {
+      key: 4,
+      label: "Bảng xếp hạng",
+      onClick: () => navigate('/ranking')
+    },
+    {
+      key: 5,
+      label: "Về tôi",
+      onClick: () => navigate('/about')
+    },
+  ];
 
   return (
     <Layout>
@@ -53,23 +60,24 @@ const App: React.FC = () => {
         <Menu
           theme="light"
           mode="horizontal"
-          defaultSelectedKeys={["2"]}
           items={items}
           style={{ flex: 1, minWidth: 0 }}
         />
         <Button type="text">Đăng ký</Button>
         <Button type="text">Đăng nhập</Button>
       </Header>
-      <Content >
+      <Content>
         <div
           style={{
             background: colorBgContainer,
-            minHeight: 280,
+            // minHeight: 280,
             paddingTop: 12,
             borderRadius: borderRadiusLG,
           }}
         >
+          <div className="wrapper">
           <Outlet/>
+          </div>
         </div>
       </Content>
       <Footer

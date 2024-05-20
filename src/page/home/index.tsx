@@ -1,14 +1,15 @@
 import React from "react";
 import "./index.css";
 import { Typography } from "antd";
-import SearchComp from "./comp/search";
+import SearchComp from "../../component/search";
 import Lesson from "./lesson";
 import Post from "./post";
+import Rank from "./rank";
 interface Props {}
 
 const HomePage: React.FC<Props> = () => {
   return (
-    <div className="wrapper">
+    <div >
       <div className="big-thumb">
         <div className="big-thumb-content">
           <h1 className="bona-nova-regular-italic">
@@ -29,6 +30,7 @@ const HomePage: React.FC<Props> = () => {
             <SearchComp className="search-comp"/>
             <Lesson/>
             <Post/>
+            <Rank/>
       </div>
     </div>
   );

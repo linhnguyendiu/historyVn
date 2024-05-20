@@ -4,11 +4,11 @@ import PostCard from "./comp/postCard";
 const { Search } = Input;
 const Post = (props: any) => {
   return (
-    <div className="lesson-wrapper">
+    <div className="post-wrapper">
       <div className="title">
         <h1>Bài viết nổi bật</h1>
       </div>
-      <div className="description-lesson">
+      <div className="description-post">
         <span>
           Lorem ipsum dolor sit amet consectetur. Tempus tincidunt etiam eget
           elit id imperdiet et. Cras eu sit dignissim lorem nibh et. Ac cum eget
@@ -16,11 +16,15 @@ const Post = (props: any) => {
         </span>
         <Button type="primary">Xem tất cả</Button>
       </div>
-      <div className="lesson-card">
-          <PostCard/>
-          <PostCard/>
-          <PostCard/>
-          <PostCard/>
+      <div className="post-element">
+        <div className="post-col-1">
+          <PostCard />
+          <PostCard />
+        </div>
+        <div className="post-col-1">
+          <PostCard />
+          <PostCard />
+        </div>
       </div>
     </div>
   );

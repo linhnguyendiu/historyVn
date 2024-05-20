@@ -4,6 +4,7 @@ import Layout from "./layout";
 import { ConfigProvider } from 'antd';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import HomePage from './page/home';
+import CoursePage from './page/course';
 function App() {
   return (
     <ConfigProvider
@@ -32,7 +33,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<Layout />}>
-            <Route path='/' element = {<HomePage/>}/>
+            <Route path='/' element = {<HomePage/>}/> 
+            <Route path='/course' element = {<CoursePage/>}/> 
           </Route>
         </Routes>
       </BrowserRouter>
