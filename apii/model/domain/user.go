@@ -4,10 +4,14 @@ import "time"
 
 type User struct {
 	Id          int `gorm:"primaryKey"`
-	Name        string
+	FirstName   string
+	LastName    string
 	Email       string
 	Password    string
+	Address     string
 	Avatar      string
+	Balance     int
+	Rank        int
 	Token       string
 	CreatedAt   time.Time `gorm:"type:TIMESTAMP;not null;default:CURRENT_TIMESTAMP"`
 	UpdatedAt   time.Time `gorm:"type:TIMESTAMP;not null;default:CURRENT_TIMESTAMP"`

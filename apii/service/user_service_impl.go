@@ -7,8 +7,9 @@ import (
 	"go-pzn-restful-api/model/domain"
 	"go-pzn-restful-api/model/web"
 	"go-pzn-restful-api/repository"
-	"golang.org/x/crypto/bcrypt"
 	"os"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserServiceImpl struct {
@@ -61,6 +62,11 @@ func (s *UserServiceImpl) Login(input web.UserLoginInput) web.UserResponse {
 		panic(helper.NewBadRequestError(errors.New("Email or password is wrong").Error()))
 	}
 
+	findByAddress, err := s.UserRepository.FindByAddress(input.Address)
+	if findByAddress.Id == 0 {
+		panic(helper.NewBadRequestError(errors.New("Address is wrong").Error()))
+	}
+
 	err = bcrypt.CompareHashAndPassword([]byte(findByEmail.Password), []byte(input.Password))
 	if err != nil {
 		panic(helper.NewBadRequestError(errors.New("Email or password is wrong").Error()))
@@ -77,16 +83,23 @@ func (s *UserServiceImpl) Login(input web.UserLoginInput) web.UserResponse {
 func (s *UserServiceImpl) Register(input web.UserRegisterInput) web.UserResponse {
 	findByEmail, err := s.UserRepository.FindByEmail(input.Email)
 	if findByEmail.Id != 0 {
-		panic(helper.NewNotFoundError(errors.New("Email has been registered").Error()))
+		panic(helper.NewNotFoundError(errors.New("email has been registered").Error()))
+	}
+
+	findByAddress, err := s.UserRepository.FindByAddress(input.Address)
+	if findByAddress.Id != 0 {
+		panic(helper.NewNotFoundError(errors.New("Address has been registered").Error()))
 	}
 
 	password, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	helper.PanicIfError(err)
 
 	domainUser := domain.User{
-		Name:     input.Name,
-		Email:    input.Email,
-		Password: string(password),
+		FirstName: input.FirstName,
+		LastName:  input.LastName,
+		Email:     input.Email,
+		Password:  string(password),
+		Address:   input.Address,
 	}
 	save := s.UserRepository.Save(domainUser)
 	helper.PanicIfError(err)

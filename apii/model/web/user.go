@@ -1,20 +1,27 @@
 package web
 
 type UserRegisterInput struct {
-	Name     string `json:"name" binding:"required"`
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
+	LastName  string `json:"last_name" binding:"required"`
+	FirstName string `json:"first_name" binding:"required"`
+	Email     string `json:"email" binding:"required,email"`
+	Password  string `json:"password" binding:"required"`
+	Address   string `json:"address" binding:"required"`
 }
 
 type UserLoginInput struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required"`
+	Address  string `json:"address" binding:"required"`
 }
 
 type UserResponse struct {
-	Id     int    `json:"id"`
-	Name   string `json:"name"`
-	Email  string `json:"email"`
-	Avatar string `json:"avatar"`
-	Token  string `json:"token"`
+	Id        int    `json:"id"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+	Address   string `json:"address"`
+	Avatar    string `json:"avatar"`
+	Token     string `json:"token"`
+	Balance   int    `json:"balance"`
+	Rank      int    `json:"rank"`
 }

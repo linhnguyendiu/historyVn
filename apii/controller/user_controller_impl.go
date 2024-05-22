@@ -2,10 +2,11 @@ package controller
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"go-pzn-restful-api/helper"
 	"go-pzn-restful-api/model/web"
 	"go-pzn-restful-api/service"
+
+	"github.com/gin-gonic/gin"
 )
 
 type UserControllerImpl struct {
@@ -18,7 +19,7 @@ func (c *UserControllerImpl) Logout(ctx *gin.Context) {
 	if userResponse.Token == "" {
 		ctx.JSON(200,
 			helper.APIResponse(200, "You're logged out",
-				gin.H{"user": userResponse.Name, "token": userResponse.Token}),
+				gin.H{"user": userResponse.FirstName, "token": userResponse.Token}),
 		)
 	}
 }
@@ -37,7 +38,7 @@ func (c *UserControllerImpl) UploadAvatar(ctx *gin.Context) {
 	ctx.JSON(
 		200,
 		helper.APIResponse(200, "Your avatar has been uploaded",
-			gin.H{"user": uploadAvatar.Name, "avatar": uploadAvatar.Avatar, "is_uploaded": true}),
+			gin.H{"user": uploadAvatar.FirstName, "avatar": uploadAvatar.Avatar, "is_uploaded": true}),
 	)
 }
 
@@ -47,7 +48,7 @@ func (c *UserControllerImpl) GetById(ctx *gin.Context) {
 	findById := c.UserService.FindById(user.Id)
 	ctx.JSON(
 		200,
-		helper.APIResponse(200, "Current user: "+findById.Name, findById),
+		helper.APIResponse(200, "Current user: "+findById.FirstName, findById),
 	)
 }
 

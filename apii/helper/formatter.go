@@ -8,8 +8,12 @@ import (
 func ToUserResponse(user domain.User) web.UserResponse {
 	userResponse := web.UserResponse{}
 	userResponse.Id = user.Id
-	userResponse.Name = user.Name
+	userResponse.LastName = user.LastName
+	userResponse.FirstName = user.FirstName
 	userResponse.Email = user.Email
+	userResponse.Address = user.Address
+	userResponse.Rank = user.Rank
+	userResponse.Balance = user.Balance
 	userResponse.Avatar = user.Avatar
 	userResponse.Token = user.Token
 

@@ -5,6 +5,7 @@ import (
 	"go-pzn-restful-api/helper"
 	"go-pzn-restful-api/model/web"
 	"go-pzn-restful-api/service"
+	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -58,7 +59,7 @@ func (c *CourseControllerImpl) UserEnrolled(ctx *gin.Context) {
 
 	ctx.JSON(200,
 		helper.APIResponse(200, "Success to enrolled",
-			gin.H{"enrolled_by": user.Name}),
+			gin.H{"enrolled_by": user.FirstName}),
 	)
 }
 
@@ -79,9 +80,8 @@ func (c *CourseControllerImpl) GetByAuthorId(ctx *gin.Context) {
 }
 
 func (c *CourseControllerImpl) GetBySlug(ctx *gin.Context) {
-	//slug := ctx.Param("slug")
 	courseResponse := c.CourseService.FindBySlug(ctx.Param("slug"))
-	ctx.JSON(200,
+	ctx.JSON(http.StatusOK,
 		helper.APIResponse(200, "Course detail", courseResponse),
 	)
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"go-pzn-restful-api/helper"
 	"go-pzn-restful-api/model/domain"
+
 	"gorm.io/gorm"
 )
 
@@ -16,6 +17,16 @@ func (r *UserRepositoryImpl) FindByEmail(email string) (domain.User, error) {
 	err := r.db.Find(&user, "email=?", email).Error
 	if err != nil {
 		return user, errors.New("User not found")
+	}
+
+	return user, nil
+}
+
+func (r *UserRepositoryImpl) FindByAddress(address string) (domain.User, error) {
+	user := domain.User{}
+	err := r.db.Find(&user, "address=?", address).Error
+	if err != nil {
+		return user, errors.New("Address is not belong to you")
 	}
 
 	return user, nil

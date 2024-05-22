@@ -2,11 +2,12 @@ package helper
 
 import (
 	"fmt"
-	"github.com/veritrans/go-midtrans"
 	"go-pzn-restful-api/model/domain"
 	"go-pzn-restful-api/model/web"
 	"os"
 	"time"
+
+	"github.com/veritrans/go-midtrans"
 )
 
 func GetPaymentUrl(transaction domain.Transaction, user web.UserResponse) []string {
@@ -27,7 +28,7 @@ func GetPaymentUrl(transaction domain.Transaction, user web.UserResponse) []stri
 		},
 		CustomerDetail: &midtrans.CustDetail{
 			Email: user.Email,
-			FName: user.Name,
+			FName: user.FirstName,
 		},
 	}
 

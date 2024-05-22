@@ -1,14 +1,15 @@
 package app
 
 import (
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
 	"go-pzn-restful-api/auth"
 	"go-pzn-restful-api/controller"
 	"go-pzn-restful-api/helper"
 	"go-pzn-restful-api/middleware"
 	"go-pzn-restful-api/repository"
 	"go-pzn-restful-api/service"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
 var (
