@@ -1,0 +1,8 @@
+.idea
+request.md
+.env
+assets
+test/assets
+note.md
+database.sql
+docs/note.txt
