@@ -38,7 +38,7 @@ const App: React.FC = () => {
     {
       key: 4,
       label: "Bảng xếp hạng",
-      onClick: () => navigate('/ranking')
+      onClick: () => navigate('/chart')
     },
     {
       key: 5,

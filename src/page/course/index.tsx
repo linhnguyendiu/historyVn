@@ -10,7 +10,7 @@ const CoursePage:React.FC<Props> = () => {
         <div className="content-course-wrapper">
             <SearchComp/>
             <div className="content-course">
-                <HistoryPhase/>
+                <HistoryPhase></HistoryPhase>
                 <HistoryContent/>
             </div>
         </div>

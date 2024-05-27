@@ -1,6 +1,6 @@
 import React from "react";
 import { Input, List, Avatar, Flex } from "antd";
-import PostCard from "./comp/postCard";
+import PostCard from "../page/home/comp/postCard";
 import { title } from "process";
 const { Search } = Input;
 
@@ -28,7 +28,7 @@ const ListRank: React.FC = () => (
     renderItem={(item, index) => (
       <List.Item style={{ display: 'block'}}>
         <div className="rank-item">
-            <h3>{index}</h3>
+            <span style={{ fontSize: '2.5rem', fontWeight:"bold"}}>{index}</span>
         </div>
         <div className="rank-title">{item.title}</div>
         <List.Item.Meta

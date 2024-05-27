@@ -4,7 +4,7 @@ import PostCard from "./comp/postCard";
 const { Search } = Input;
 const Post = (props: any) => {
   return (
-    <div className="post-wrapper">
+    <div className="post-home-wrapper">
       <div className="title">
         <h1>Bài viết nổi bật</h1>
       </div>

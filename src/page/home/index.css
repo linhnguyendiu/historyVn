@@ -73,7 +73,7 @@
     margin-top: 20px;
   }
 }
-.post-wrapper {
+.post-home-wrapper {
   display: flex;
   flex-direction: column;
   margin-top: 20px;
@@ -91,4 +91,7 @@
 .rank-element { 
   background-color: white;
   border-radius: 10px;
+}
+.rank-item span { 
+  font-size: 2rem;
 }

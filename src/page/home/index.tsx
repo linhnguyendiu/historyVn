@@ -4,7 +4,7 @@ import { Typography } from "antd";
 import SearchComp from "../../component/search";
 import Lesson from "./lesson";
 import Post from "./post";
-import Rank from "./rank";
+import Rank from "../../component/rank";
 interface Props {}
 
 const HomePage: React.FC<Props> = () => {
