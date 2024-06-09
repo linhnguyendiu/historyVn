@@ -17,4 +17,6 @@ type CourseRepository interface {
 	UsersEnrolled(userCourse domain.UserCourse) domain.UserCourse
 	CountUsersEnrolled(courseId int) int
 	FindAllCourseIdByUserId(userId int) []string
+	GetTotalQuestionsByCourseId(courseID int) (int64, error)
+	SaveResult(examResult domain.ExamResult) domain.ExamResult
 }

@@ -63,7 +63,7 @@ func (s *UserServiceImpl) Login(input web.UserLoginInput) web.UserResponse {
 	}
 
 	findByAddress, err := s.UserRepository.FindByAddress(input.Address)
-	if findByAddress.Id == 0 {
+	if findByAddress.Id == 0 || err != nil || findByAddress.Email != input.Email {
 		panic(helper.NewBadRequestError(errors.New("Address is wrong").Error()))
 	}
 
@@ -82,12 +82,12 @@ func (s *UserServiceImpl) Login(input web.UserLoginInput) web.UserResponse {
 
 func (s *UserServiceImpl) Register(input web.UserRegisterInput) web.UserResponse {
 	findByEmail, err := s.UserRepository.FindByEmail(input.Email)
-	if findByEmail.Id != 0 {
+	if findByEmail.Id != 0 || err != nil {
 		panic(helper.NewNotFoundError(errors.New("email has been registered").Error()))
 	}
 
 	findByAddress, err := s.UserRepository.FindByAddress(input.Address)
-	if findByAddress.Id != 0 {
+	if findByAddress.Id != 0 || err != nil {
 		panic(helper.NewNotFoundError(errors.New("Address has been registered").Error()))
 	}
 

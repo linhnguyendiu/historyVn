@@ -100,6 +100,23 @@ func (c *CourseControllerImpl) Create(ctx *gin.Context) {
 	)
 }
 
+func (c *CourseControllerImpl) GetExamScore(ctx *gin.Context) {
+	request := web.ExamRequest{}
+	err := ctx.ShouldBindJSON(&request)
+	helper.PanicIfError(err)
+
+	courseId, err := strconv.Atoi(ctx.Param("courseId"))
+	helper.PanicIfError(err)
+	request.CourseId = courseId
+
+	authorId := ctx.MustGet("current_author").(web.AuthorResponse).Id
+	request.UserId = authorId
+
+	examResultResponse := c.CourseService.GetScore(ctx, request)
+
+	ctx.JSON(http.StatusOK, gin.H{"result": examResultResponse})
+}
+
 func NewCourseController(courseService service.CourseService) CourseController {
 	return &CourseControllerImpl{CourseService: courseService}
 }

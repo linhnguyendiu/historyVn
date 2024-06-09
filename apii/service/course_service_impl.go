@@ -1,19 +1,22 @@
 package service
 
 import (
-	"errors"
+	"context"
+	"fmt"
 	"go-pzn-restful-api/helper"
 	"go-pzn-restful-api/model/domain"
 	"go-pzn-restful-api/model/web"
 	"go-pzn-restful-api/repository"
 	"os"
-	"strings"
-	"time"
+
+	"github.com/go-redis/redis"
 )
 
 type CourseServiceImpl struct {
 	repository.CourseRepository
 	TransactionService
+	repository.OptionRepository
+	repository.ExamResultRepository
 }
 
 func (s *CourseServiceImpl) FindAllCourseIdByUserId(userId int) []string {
@@ -132,8 +135,9 @@ func (s *CourseServiceImpl) FindById(courseId int) web.CourseResponse {
 	if err != nil {
 		panic(helper.NewNotFoundError(err.Error()))
 	}
-	countUsersEnrolled := s.CourseRepository.CountUsersEnrolled(findById.Id)
-	return helper.ToCourseResponse(findById, countUsersEnrolled)
+	//countUsersEnrolled := s.CourseRepository.CountUsersEnrolled(findById.Id)
+	return helper.ToCourseResponse(findById, 1)
+	//return helper.ToCourseResponse(findById, countUsersEnrolled)
 }
 
 func (s *CourseServiceImpl) Create(request web.CourseCreateInput) web.CourseResponse {
@@ -142,8 +146,8 @@ func (s *CourseServiceImpl) Create(request web.CourseCreateInput) web.CourseResp
 		Title:       request.Title,
 		Slug:        request.Slug,
 		Description: request.Description,
-		Perks:       request.Perks,
 		Price:       request.Price,
+		Reward:      request.Reward,
 	}
 
 	if course.AuthorId == 0 {
@@ -151,21 +155,84 @@ func (s *CourseServiceImpl) Create(request web.CourseCreateInput) web.CourseResp
 	}
 
 	save := s.CourseRepository.Save(course)
-	categoryCourse := s.CourseRepository.SaveToCategoryCourse(strings.ToLower(request.Category), save.Id)
-	if !categoryCourse {
-		panic(errors.New("Failed to create category for this course"))
-	}
+	// categoryCourse := s.CourseRepository.SaveToCategoryCourse(strings.ToLower(request.Category), save.Id)
+	// if !categoryCourse {
+	// 	panic(errors.New("Failed to create category for this course"))
+	// }
 
 	return helper.ToCourseResponse(save, 0)
 }
 
 func updateWhenUploadBanner(course domain.Course, pathFile string, courseRepository repository.CourseRepository) bool {
 	course.Banner = pathFile
-	course.UpdatedAt = time.Now()
 	courseRepository.Update(course)
 	return true
 }
 
-func NewCourseService(courseRepository repository.CourseRepository) CourseService {
-	return &CourseServiceImpl{CourseRepository: courseRepository}
+func (s *CourseServiceImpl) GetScore(ctx context.Context, request web.ExamRequest) web.ExamResultResponse {
+	examResult := domain.ExamResult{
+		CourseId:       request.CourseId,
+		UserId:         request.UserId,
+		Score:          0,
+		TotalQuestions: 0,
+	}
+
+	totalQuestions, err := s.CourseRepository.GetTotalQuestionsByCourseId(examResult.CourseId)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+	examResult.TotalQuestions = int(totalQuestions)
+
+	for _, answerID := range request.Anwers {
+		option, err := s.OptionRepository.FindById(answerID)
+		if err != nil {
+			panic(helper.NewNotFoundError(err.Error()))
+		}
+		if option.IsCorrect {
+			examResult.Score++
+		}
+	}
+	examResult.Score = int((float64(examResult.Score) / float64(examResult.TotalQuestions)) * 10)
+	//save := s.ExamResultRepository.Save(examResult)
+
+	// Kiểm tra lượt làm của người dùng
+	userAttemptsKey := fmt.Sprintf("user:%d:course:%d:attempts", request.UserId, request.CourseId)
+	attemptCount, err := helper.RedisCli.Get(ctx, userAttemptsKey).Int()
+	if err == redis.Nil {
+		attemptCount = 0
+	}
+	// } else if err != nil {
+	// 	panic(err)
+	// }
+
+	attemptCount++
+
+	if attemptCount == 1 {
+		// Lần làm đầu tiên, lưu vào cơ sở dữ liệu
+		save := s.ExamResultRepository.Save(examResult)
+		if err := helper.RedisCli.Set(ctx, userAttemptsKey, 1, 0).Err(); err != nil {
+			panic(err)
+		}
+		return helper.ToExamResultResponse(save)
+	} else {
+		// Lần làm thứ 2 trở đi, lưu vào Redis
+		scoreKey := fmt.Sprintf("user:%d:course:%d:attempt:%d:score", request.UserId, request.CourseId, attemptCount)
+		if err := helper.RedisCli.Set(ctx, scoreKey, examResult.Score, 0).Err(); err != nil {
+			panic(err)
+		}
+		if err := helper.RedisCli.Set(ctx, userAttemptsKey, attemptCount, 0).Err(); err != nil {
+			panic(err)
+		}
+		return web.ExamResultResponse{
+			UserId:         request.UserId,
+			CourseId:       request.CourseId,
+			Attempt:        attemptCount,
+			Score:          examResult.Score,
+			TotalQuestions: examResult.TotalQuestions,
+		}
+	}
+}
+
+func NewCourseService(courseRepository repository.CourseRepository, optionRepository repository.OptionRepository, examResultRepository repository.ExamResultRepository) CourseService {
+	return &CourseServiceImpl{CourseRepository: courseRepository, OptionRepository: optionRepository, ExamResultRepository: examResultRepository}
 }

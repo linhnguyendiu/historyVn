@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go-pzn-restful-api/helper"
 	"go-pzn-restful-api/model/domain"
+
 	"gorm.io/gorm"
 )
 
@@ -129,6 +130,22 @@ func (r *CourseRepositoryImpl) FindById(courseId int) (domain.Course, error) {
 	}
 
 	return course, nil
+}
+
+func (r *CourseRepositoryImpl) GetTotalQuestionsByCourseId(courseId int) (int64, error) {
+	var count int64
+	err := r.db.Model(&domain.Question{}).Where("course_id = ?", courseId).Count(&count).Error
+	if err != nil {
+		return 0, errors.New("course not found")
+	}
+	return count, nil
+}
+
+func (r *CourseRepositoryImpl) SaveResult(examResult domain.ExamResult) domain.ExamResult {
+	err := r.db.Create(&examResult).Error
+	helper.PanicIfError(err)
+
+	return examResult
 }
 
 func (r *CourseRepositoryImpl) Save(course domain.Course) domain.Course {

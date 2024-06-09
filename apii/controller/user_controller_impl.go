@@ -27,10 +27,12 @@ func (c *UserControllerImpl) Logout(ctx *gin.Context) {
 func (c *UserControllerImpl) UploadAvatar(ctx *gin.Context) {
 	fileHeader, err := ctx.FormFile("avatar")
 	helper.PanicIfError(err)
-	user := ctx.MustGet("current_user").(web.UserResponse)
-	filePath := fmt.Sprintf("assets/images/avatars/%s-%s", user.Email, fileHeader.Filename)
+	userId := ctx.MustGet("current_user").(web.UserResponse).Id
+	user := c.UserService.FindById(userId)
+	filePath := fmt.Sprintf("assets/images/avatars/%s-%s", user.Email, f
+	ileHeader.Filename)
 
-	uploadAvatar := c.UserService.UploadAvatar(user.Id, filePath)
+	uploadAvatar := c.UserService.UploadAvatar(userId, filePath)
 
 	err = ctx.SaveUploadedFile(fileHeader, filePath)
 	helper.PanicIfError(err)

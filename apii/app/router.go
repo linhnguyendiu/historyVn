@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"go-pzn-restful-api/auth"
 	"go-pzn-restful-api/controller"
 	"go-pzn-restful-api/helper"
@@ -28,18 +29,44 @@ var (
 
 	// course
 	courseRepository = repository.NewCourseRepository(db)
-	courseService    = service.NewCourseService(courseRepository)
+	courseService    = service.NewCourseService(courseRepository, optionRepository, examResultRepository)
 	courseController = controller.NewCourseController(courseService)
+
+	// post
+	postRepository = repository.NewPostRepository(db)
+	postService    = service.NewPostService(postRepository, commentRepository, commentService, userService)
+	postController = controller.NewPostController(postService)
+
+	// comment
+	commentRepository = repository.NewCommentRepository(db)
+	commentService    = service.NewCommentService(commentRepository, postRepository, userService)
+	commentController = controller.NewCommentController(commentService)
 
 	// category
 	categoryRepository = repository.NewCategoryRepository(db)
 	categoryService    = service.NewCategoryService(categoryRepository)
 	categoryController = controller.NewCategoryController(categoryService)
 
+	// chapter
+	chapterRepository = repository.NewChapterRepository(db)
+	chapterService    = service.NewChapterService(chapterRepository, courseService)
+	chapterController = controller.NewChapterController(chapterService)
+
+	// question
+	questionRepository   = repository.NewQuestionRepository(db)
+	examResultRepository = repository.NewExamResultRepository(db)
+	questionService      = service.NewQuestionService(questionRepository, courseService, optionRepository)
+	questionController   = controller.NewQuestionController(questionService)
+
+	// option
+	optionRepository = repository.NewOptionRepository(db)
+	optionService    = service.NewOptionService(optionRepository, courseService)
+	optionController = controller.NewOptionController(optionService)
+
 	// lesson_title
-	lessonTitleRepository = repository.NewLessonTitleRepository(db)
-	lessonTitleService    = service.NewLessonTitleService(lessonTitleRepository, courseService)
-	lessonTitleController = controller.NewLessonTitleController(lessonTitleService)
+	lessonRepository = repository.NewLessonRepository(db)
+	lessonService    = service.NewLessonService(lessonRepository, courseService)
+	lessonController = controller.NewLessonController(lessonService)
 
 	// lesson_content
 	lessonContentRepository = repository.NewLessonContentRepository(db)
@@ -53,6 +80,7 @@ var (
 
 func NewRouter() *gin.Engine {
 	helper.EnvInit()
+	helper.InitRedis()
 	DBMigrate(db)
 
 	router := gin.Default()
@@ -61,10 +89,24 @@ func NewRouter() *gin.Engine {
 
 	v1 := router.Group("/api/v1")
 
+	c := helper.NewCronHelper()
+
+	// Lên lịch công việc
+	_, err := c.AddFunc("*/30 * * * * ", func() {
+		postService.ProcessPosts()
+	})
+	if err != nil {
+		fmt.Println("Error adding cron job:", err)
+		return nil
+	}
+
+	// Bắt đầu cron scheduler
+	c.Start()
+
 	// User endpoints
 	v1.POST("/users", userController.Register)
 	v1.POST("/users/login", userController.Login)
-	v1.PUT("/users/avatars", middleware.UserJwtAuthMiddleware(jwtAuth, userService), userController.UploadAvatar)
+	v1.PATCH("/users/avatars", middleware.UserJwtAuthMiddleware(jwtAuth, userService), userController.UploadAvatar)
 	v1.GET("/users", middleware.UserJwtAuthMiddleware(jwtAuth, userService), userController.GetById)
 	v1.POST("/users/logout", middleware.UserJwtAuthMiddleware(jwtAuth, userService), userController.Logout)
 
@@ -89,15 +131,53 @@ func NewRouter() *gin.Engine {
 	// keknya dibawah ini ga perlu deh, soalnya udah ada transaksi endpoint
 	v1.POST("/courses/:courseId/enrolled", middleware.UserJwtAuthMiddleware(jwtAuth, userService), courseController.UserEnrolled)
 
+	v1.POST("/courses/:courseId/exam-result", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), courseController.GetExamScore)
+
+	// Post endpoints
+	v1.POST("/posts", middleware.UserJwtAuthMiddleware(jwtAuth, userService), postController.Create)
+	v1.GET("/posts/users", middleware.UserJwtAuthMiddleware(jwtAuth, userService), postController.GetByUserId)
+	v1.GET("/posts", postController.GetAll)
+	v1.GET("/posts/calculate-points", postController.ProcessPosts)
+	v1.GET("/posts/postdetail/:postId", postController.GetByPostId)
+	v1.GET("/posts/topics/:topicName", postController.GetByTopic)
+	v1.GET("/posts/keywords/:slug", postController.GetByKeyword)
+	v1.PATCH("/posts/likes/:postId", middleware.UserJwtAuthMiddleware(jwtAuth, userService), postController.LikePost)
+	v1.PATCH("/posts/dislikes/:postId", middleware.UserJwtAuthMiddleware(jwtAuth, userService), postController.DisLikePost)
+
+	// Comment endpoints
+	v1.POST("/comments", middleware.UserJwtAuthMiddleware(jwtAuth, userService), commentController.Create)
+	v1.GET("/comments", postController.GetAll)
+	v1.GET("/comments/calculate-points", commentController.ProcessComments)
+	v1.GET("/comments/comment-detail/:postId", commentController.GetCommentsByPostId)
+	v1.GET("/comments/comment-list-detail/:commentId", commentController.GetByCommentFatherId)
+	v1.PATCH("/comments/likes/:commentId", middleware.UserJwtAuthMiddleware(jwtAuth, userService), commentController.LikeComment)
+	v1.PATCH("/comments/dislikes/:commentId", middleware.UserJwtAuthMiddleware(jwtAuth, userService), commentController.DisLikeComment)
+	v1.GET("/comments/by-user", middleware.UserJwtAuthMiddleware(jwtAuth, userService), commentController.GetCommentsByUserId)
+
+	// Chapter title endpoints
+	v1.POST("/authors/courses/:courseId/chapter-titles", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), chapterController.Create)
+	v1.PATCH("/authors/courses/:courseId/chapter-titles/:ltId", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), chapterController.Update)
+	v1.GET("/courses/enrolled/:courseId/chapter-titles", chapterController.GetByCourseId)
+
+	// Question title endpoints
+	v1.POST("/authors/courses/:courseId/questions", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), questionController.Create)
+	v1.GET("/courses/enrolled/:courseId/questions", questionController.GetByCourseId)
+	v1.GET("/courses/enrolled/:courseId/question/:questionId", questionController.GetByQuestionId)
+
+	// Option title endpoints
+	v1.POST("/authors/courses/:courseId/question/:questionId/option", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), optionController.Create)
+	v1.GET("/courses/enrolled/:courseId/question/:questionId/option", optionController.GetByQuestionId)
+
 	// Lesson title endpoints
-	v1.POST("/authors/courses/:courseId/lesson-titles", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), lessonTitleController.Create)
-	v1.PATCH("/authors/courses/:courseId/lesson-titles/:ltId", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), lessonTitleController.Update)
-	v1.GET("/courses/enrolled/:courseId/lesson-titles", lessonTitleController.GetByCourseId)
+	v1.POST("/authors/courses/:courseId/chapter/:chapterId/lesson-titles", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), lessonController.Create)
+	v1.PATCH("/authors/courses/:courseId/lesson-titles/:ltId", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), lessonController.Update)
+	v1.GET("/courses/enrolled/:courseId/chapter/:chapterId/lesson-titles", lessonController.GetByChapterId)
 
 	// Lesson content endpoints
 	v1.POST("/authors/courses/:courseId/lesson-titles/:ltId/lesson-contents", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), lessonContentController.Create)
-	v1.PATCH("/authors/courses/:courseId/lesson-contents/:lcId", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), lessonContentController.Update)
-	v1.GET("/c/:courseId/lesson-titles/:ltId/lesson-contents", lessonContentController.GetByLessonTitleId)
+	v1.PUT("/authors/lesson-content/:lcId/illustrations", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), lessonContentController.UploadIllustration)
+	// v1.PATCH("/authors/courses/:courseId/lesson-contents/:lcId", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), lessonContentController.Update)
+	v1.GET("/c/:courseId/lesson-titles/:ltId/lesson-contents", lessonContentController.GetByLessonId)
 	v1.GET("/c/:courseId/lesson-contents/:lcId",
 		middleware.UserJwtAuthMiddleware(jwtAuth, userService),
 		middleware.MidtransPaymentMiddleware(courseService),

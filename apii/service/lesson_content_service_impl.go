@@ -22,8 +22,8 @@ func (s *LessonContentServiceImpl) FindById(lcId int) web.LessonContentResponse 
 	return helper.ToLessonContentResponse(lessonContent)
 }
 
-func (s *LessonContentServiceImpl) FindByLessonTitleId(ltId int) []web.LessonContentResponse {
-	lessonContents, err := s.LessonContentRepository.FindByLessonTitleId(ltId)
+func (s *LessonContentServiceImpl) FindByLessonId(ltId int) []web.LessonContentResponse {
+	lessonContents, err := s.LessonContentRepository.FindByLessonId(ltId)
 	if err != nil {
 		panic(helper.NewNotFoundError(err.Error()))
 	}
@@ -31,35 +31,35 @@ func (s *LessonContentServiceImpl) FindByLessonTitleId(ltId int) []web.LessonCon
 	return helper.ToLessonContentsResponse(lessonContents)
 }
 
-func (s *LessonContentServiceImpl) Update(lcId int, input web.LessonContentUpdateInput) web.LessonContentResponse {
-	course := s.CourseService.FindById(input.CourseId)
-	if course.AuthorId != input.AuthorId {
-		panic(helper.NewUnauthorizedError("You're not an author of this courses"))
-	}
+// func (s *LessonContentServiceImpl) Update(lcId int, input web.LessonContentUpdateInput) web.LessonContentResponse {
+// 	course := s.CourseService.FindById(input.CourseId)
+// 	if course.AuthorId != input.AuthorId {
+// 		panic(helper.NewUnauthorizedError("You're not an author of this courses"))
+// 	}
 
-	findById, err := s.LessonContentRepository.FindById(lcId)
-	oldContent := findById.Content
-	if err != nil {
-		panic(helper.NewNotFoundError(err.Error()))
-	}
+// 	findById, err := s.LessonContentRepository.FindById(lcId)
+// 	oldContent := findById.Content
+// 	if err != nil {
+// 		panic(helper.NewNotFoundError(err.Error()))
+// 	}
 
-	if input.InOrder != 0 {
-		findById.InOrder = input.InOrder
-	}
+// 	if input.InOrder != 0 {
+// 		findById.InOrder = input.InOrder
+// 	}
 
-	if input.Content != "" {
-		findById.Content = input.Content
-		findById.Duration = helper.GetLessonContentVideoDuration(input.Content)
-		lessonContent := s.LessonContentRepository.Update(findById)
-		if oldContent != lessonContent.Content {
-			os.Remove(oldContent)
-		}
-		return helper.ToLessonContentResponse(lessonContent)
-	}
+// 	if input.Content != "" {
+// 		findById.Content = input.Content
+// 		findById.Duration = helper.GetLessonContentVideoDuration(input.Content)
+// 		lessonContent := s.LessonContentRepository.Update(findById)
+// 		if oldContent != lessonContent.Content {
+// 			os.Remove(oldContent)
+// 		}
+// 		return helper.ToLessonContentResponse(lessonContent)
+// 	}
 
-	lessonContent := s.LessonContentRepository.Update(findById)
-	return helper.ToLessonContentResponse(lessonContent)
-}
+// 	lessonContent := s.LessonContentRepository.Update(findById)
+// 	return helper.ToLessonContentResponse(lessonContent)
+// }
 
 func (s *LessonContentServiceImpl) Create(input web.LessonContentCreateInput) web.LessonContentResponse {
 	course := s.CourseService.FindById(input.CourseId)
@@ -68,10 +68,10 @@ func (s *LessonContentServiceImpl) Create(input web.LessonContentCreateInput) we
 	}
 
 	lessonContent := domain.LessonContent{}
-	lessonContent.LessonTitleId = input.LessonTitleId
+	lessonContent.LessonId = input.LessonId
 	lessonContent.Content = input.Content
+	lessonContent.Description = input.Description
 	lessonContent.InOrder = input.InOrder
-	lessonContent.Duration = helper.GetLessonContentVideoDuration(input.Content)
 
 	content := s.LessonContentRepository.Save(lessonContent)
 	//if err != nil {
@@ -80,6 +80,29 @@ func (s *LessonContentServiceImpl) Create(input web.LessonContentCreateInput) we
 	//}
 
 	return helper.ToLessonContentResponse(content)
+}
+
+func (s *LessonContentServiceImpl) UploadIllustration(lcId int, pathFile string) bool {
+	findById, err := s.LessonContentRepository.FindById(lcId)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	if findById.Illustration != pathFile {
+		if findById.Illustration == "" {
+			return updateWhenUploadIllustration(findById, pathFile, s.LessonContentRepository)
+		}
+		os.Remove(findById.Illustration)
+		return updateWhenUploadIllustration(findById, pathFile, s.LessonContentRepository)
+	}
+
+	return updateWhenUploadIllustration(findById, pathFile, s.LessonContentRepository)
+}
+
+func updateWhenUploadIllustration(lessonContent domain.LessonContent, pathFile string, lessonContentRepository repository.LessonContentRepository) bool {
+	lessonContent.Illustration = pathFile
+	lessonContentRepository.Update(lessonContent)
+	return true
 }
 
 func NewLessonContentService(lessonContentRepository repository.LessonContentRepository, courseService CourseService) LessonContentService {

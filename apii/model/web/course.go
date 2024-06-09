@@ -1,13 +1,15 @@
 package web
 
 type CourseCreateInput struct {
-	AuthorId    int
-	Title       string `json:"title" binding:"required"`
-	Slug        string `json:"slug" binding:"required"`
-	Description string `json:"description" binding:"required"`
-	Perks       string `json:"perks" binding:"required"`
-	Price       int    `json:"price" binding:"required"`
-	Category    string `json:"category" binding:"required"`
+	AuthorId     int
+	Title        string `json:"title" binding:"required"`
+	Slug         string `json:"slug" binding:"required"`
+	Description  string `json:"description" binding:"required"`
+	Price        int    `json:"price" binding:"required"`
+	Reward       int    `json:"reward" binding:"required"`
+	Category     string `json:"category" binding:"required"`
+	DurationQuiz int
+	QuizzesCount int
 }
 
 type CourseResponse struct {
@@ -16,10 +18,12 @@ type CourseResponse struct {
 	Title         string `json:"title"`
 	Slug          string `json:"slug"`
 	Description   string `json:"description"`
-	Perks         string `json:"perks"`
 	Price         int    `json:"price"`
+	Reward        int    `json:"reward"`
 	Banner        string `json:"banner"`
 	UsersEnrolled int    `json:"users_enrolled"`
+	DurationQuiz  int
+	QuizzesCount  int
 }
 
 type CourseBySlugResponse struct {
@@ -28,8 +32,8 @@ type CourseBySlugResponse struct {
 	Title         string         `json:"title"`
 	Slug          string         `json:"slug"`
 	Description   string         `json:"description"`
-	Perks         string         `json:"perks"`
 	Price         int            `json:"price"`
+	Reward        int            `json:"reward"`
 	Banner        string         `json:"banner"`
 	UsersEnrolled int            `json:"users_enrolled"`
 	Author        AuthorResponse `json:"author"`

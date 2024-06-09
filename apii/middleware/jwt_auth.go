@@ -1,11 +1,12 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v4"
 	"go-pzn-restful-api/auth"
 	"go-pzn-restful-api/helper"
 	"go-pzn-restful-api/service"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 	//"strings"
 )
 
@@ -23,10 +24,22 @@ func UserJwtAuthMiddleware(jwtAuth auth.JwtAuth, userService service.UserService
 			panic(helper.NewUnauthorizedError("Who you are, Hah?"))
 		}
 
-		claims := validateJwtToken.Claims.(jwt.MapClaims)
-		userID := int(claims["user_id"].(float64))
+		// claims := validateJwtToken.Claims.(jwt.MapClaims)
+		// userID := int(claims["user_id"].(float64))
 
-		findByID := userService.FindById(userID)
+		claims, ok := validateJwtToken.Claims.(jwt.MapClaims)
+		if !ok {
+			panic(helper.NewUnauthorizedError("Invalid token claims"))
+		}
+
+		userIDFloat, ok := claims["user_id"].(float64)
+		if !ok {
+			panic(helper.NewUnauthorizedError("Invalid user ID in token"))
+		}
+
+		userId := int(userIDFloat)
+
+		findByID := userService.FindById(userId)
 		ctx.Set("current_user", findByID)
 	}
 }
