@@ -29,8 +29,7 @@ func (c *UserControllerImpl) UploadAvatar(ctx *gin.Context) {
 	helper.PanicIfError(err)
 	userId := ctx.MustGet("current_user").(web.UserResponse).Id
 	user := c.UserService.FindById(userId)
-	filePath := fmt.Sprintf("assets/images/avatars/%s-%s", user.Email, f
-	ileHeader.Filename)
+	filePath := fmt.Sprintf("assets/images/avatars/%s-%s", user.Email, fileHeader.Filename)
 
 	uploadAvatar := c.UserService.UploadAvatar(userId, filePath)
 

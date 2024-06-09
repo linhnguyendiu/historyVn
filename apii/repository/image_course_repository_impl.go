@@ -16,27 +16,27 @@ func (r *ImageCourseRepositoryImpl) Save(imageCourse domain.ImageCourse) domain.
 	err := r.db.Create(&imageCourse).Error
 	helper.PanicIfError(err)
 
-	return category
+	return imageCourse
 }
 
 func (r *ImageCourseRepositoryImpl) FindByCourseId(courseId int) ([]domain.ImageCourse, error) {
-	chapters := []domain.Chapter{}
-	err := r.db.Order("in_order asc").Find(&chapters, "course_id=?", courseId).Error
-	if len(chapters) == 0 || err != nil {
-		return nil, errors.New("chapter not found")
+	images := []domain.ImageCourse{}
+	err := r.db.Find(&images, "course_id=?", courseId).Error
+	if len(images) == 0 || err != nil {
+		return nil, errors.New("image not found")
 	}
 
-	return chapters, nil
+	return images, nil
 }
 
 func (r *ImageCourseRepositoryImpl) FindById(ctId int) (domain.ImageCourse, error) {
-	chapter := domain.Chapter{}
-	err := r.db.Find(&chapter, "id=?", ctId).Error
-	if chapter.Id == 0 || err != nil {
-		return chapter, errors.New("chapter not found")
+	image := domain.ImageCourse{}
+	err := r.db.Find(&image, "id=?", ctId).Error
+	if image.Id == 0 || err != nil {
+		return image, errors.New("image not found")
 	}
 
-	return chapter, nil
+	return image, nil
 }
 
 func NewImageCourseRepository(db *gorm.DB) ImageCourseRepository {
