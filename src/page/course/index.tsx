@@ -11,7 +11,7 @@ const CoursePage:React.FC<Props> = () => {
             <SearchComp/>
             <div className="content-course">
                 <HistoryPhase></HistoryPhase>
-                <HistoryContent/>
+                <HistoryContent></HistoryContent>
             </div>
         </div>
     )

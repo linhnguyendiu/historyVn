@@ -1,13 +1,20 @@
 import React from "react";
 import "./index.css";
-import { Typography } from "antd";
+import { Typography, Button } from "antd";
 import SearchComp from "../../component/search";
 import Lesson from "./lesson";
 import Post from "./post";
 import Rank from "../../component/rank";
+import { useSDK } from "@metamask/sdk-react";
+
 interface Props {}
 
 const HomePage: React.FC<Props> = () => {
+  const { sdk, connected, connecting,account, provider, chainId} = useSDK();
+  const onClick =() => { 
+    console.log('check is connected', account, connected)
+
+  }
   return (
     <div >
       <div className="big-thumb">
@@ -31,6 +38,7 @@ const HomePage: React.FC<Props> = () => {
             <Lesson/>
             <Post/>
             <Rank/>
+            <Button onClick={onClick}>Check</Button>
       </div>
     </div>
   );

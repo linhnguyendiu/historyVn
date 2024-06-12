@@ -1,0 +1,105 @@
+.user-wrapper {
+    margin: 40px 100px 40px 100px;
+    display: flex;
+    flex-direction: column;
+}
+.user-title{ 
+    span{ 
+        font-family: 'Be Vietnam Pro';
+        font-weight: 700;
+        size: 24px;
+    }
+}
+.user-course-wrapper{ 
+    margin: 20px 0px 20px 0px;
+}
+.user-info-wrapper{ 
+     display: flex;
+     flex-direction: row;
+     margin: 40px;
+     .user-info{ 
+        display: flex;
+        flex-direction: column;
+        margin-left: 40px;
+        .info{ 
+            list-style-type: none; 
+            margin: 0px ;
+            li{ 
+                margin: 10px;
+                font-family: "Be VietNam Pro";
+                font-size: 24px;
+            }
+        }
+     }
+}
+.avatar-user{ 
+    align-self: center;
+    img{ 
+        border-radius: 100px;
+        border: 1px solid #FF9500;
+        width: 200px;
+        height: 200px;
+    }
+}
+
+.course-wrapper{ 
+    background-color: white;
+    border-radius: 8px;
+    .course-text {
+        width: 90%;
+    span{ 
+        font-family: "Be VietNam Pro";
+        font-weight: 400;
+        size: 16px
+    }
+    }
+    .course-img{ 
+        display: flex;
+        flex-direction: row;
+        justify-content:space-between;
+        margin-bottom: 20px;
+        img{ 
+            width: 32%;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+    }
+    .course-user-info{ 
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+}
+.certificate-wrapper{ 
+    margin: 20px 20px 20px 20px;
+    .certificate-title{ 
+        display: flex;
+        flex-direction: row;
+        justify-content:space-between ;
+
+        .certificate-label{ 
+            font-family: "Be VietNam Pro";
+            font-weight: 400;
+            font-size: 20px;
+        }
+    }
+    .certificate-img{ 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        img{ 
+            width: 80%;
+            height: 80%;
+            object-fit: cover;
+        }
+    }
+    .inner-cert-card{ 
+        background-color: white;
+        span{ 
+            font-family: "Be VietNam Pro";
+            font-weight: 800;
+            font-size: 40px;
+        }
+    }
+}

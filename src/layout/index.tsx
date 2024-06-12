@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState,useEffect} from "react";
 import { Button, Layout, Menu, theme, Space, Divider, Typography } from "antd";
 import {
   HomeOutlined,
@@ -15,10 +15,10 @@ const { Text, Title } = Typography;
 
 const App: React.FC = () => {
   const navigate = useNavigate();
+
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
-
   const items = [
     {
       key: 1,
@@ -43,9 +43,17 @@ const App: React.FC = () => {
     {
       key: 5,
       label: "Về tôi",
-      onClick: () => navigate('/about')
+      onClick: () => navigate('/user')
     },
   ];
+//check is login
+  useEffect(() => {
+    const token = localStorage.getItem("cjwt")
+    console.log("token",token)
+    if (!token) { 
+      navigate('/signin')
+    }
+  }, [])
 
   return (
     <Layout>

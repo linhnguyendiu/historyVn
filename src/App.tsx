@@ -10,6 +10,14 @@ import Test from './page/test';
 import SharePage from './page/share';
 import Article from './page/arrticle';
 import Chart from './page/chart';
+import User from './page/user';
+import ConnectPage from './page/connectMetaMask';
+import SignIn from './page/signin';
+import SignUp from './page/signup.tsx';
+
+import history from './history'
+import CustomerRouter from './router';
+
 function App() {
   return (
     <ConfigProvider
@@ -35,19 +43,23 @@ function App() {
         }
       }}
     >
-      <BrowserRouter>
+      <CustomerRouter history={history}>
         <Routes>
+        <Route path='/' element = {<ConnectPage/>}/>
+        <Route path='/signup' element = {<SignUp/>}/>
+        <Route path='/signin' element = {<SignIn/>}/>
           <Route element={<Layout />}>
-            <Route path='/' element = {<HomePage/>}/> 
+            <Route path='/home' element = {<HomePage/>}/> 
             <Route path='/course' element = {<CoursePage/>}/> 
             <Route path='/course/nha-ho' element = {<LessonCourse/>}/>
             <Route path='/course/nha-ho/test' element = {<Test/>}/>
             <Route path='/share' element={<SharePage/>}></Route>
             <Route path='/share/article' element={<Article/>}></Route>
             <Route path='/chart' element={<Chart/>}/>
+            <Route path='/user' element={<User/>}/>
           </Route>
         </Routes>
-      </BrowserRouter>
+      </CustomerRouter>
     </ConfigProvider>
   );
 }
