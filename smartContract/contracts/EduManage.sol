@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
-import "./LinkToken.sol";
+pragma solidity ^0.8.20;
+import "./LINKToken.sol";
 import "./CertNFT.sol";
 
 contract EduManage {
@@ -60,23 +60,24 @@ contract EduManage {
         CertNFT = CertificateNFT(_NFTAddress);
     }
     
-    function addStudent(string memory name) public {
+    function addStudent(address stu_add, uint256 stu_id, string memory name) public {
         require(!hasAccount[msg.sender], "Address already has account");
         studentCount++;
-        students[studentCount].id = studentCount;
-        students[studentCount].stu_name = name;
-        students[studentCount].stuAdd = msg.sender;
-        hasAccount[msg.sender] = true;
+        students[stu_id].id = stu_id;
+        students[stu_id].stu_name = name;
+        students[stu_id].stuAdd = stu_add;
+        hasAccount[stu_add] = true;
     }
 
-    function addPost() public {
-        require(hasAccount[msg.sender], "Not authorized to add post"); 
+    function addPost(uint256 post_id, address owner_add) public {
+        require(hasAccount[owner_add], "Not authorized to add post"); 
         postCount++;
-        posts[postCount].id = postCount;
-        posts[postCount].owner = msg.sender;
+        posts[post_id].id = post_id;
+        posts[post_id].owner = owner_add;
     }
 
     function addCourse(
+        uint256 course_id,
         string memory name,
         uint256 price,
         uint256 reward,
@@ -85,17 +86,17 @@ contract EduManage {
     ) public {
         require(msg.sender == owner, "Not authorized to add course"); 
         courseCount++;
-        courses[courseCount].id = courseCount;
-        courses[courseCount].name = name;
-        courses[courseCount].price = price;
-        courses[courseCount].reward = reward;
-        courses[courseCount].courseType = courseType;
-        courses[courseCount].hashCourse = hashCourse;
-        courses[courseCount].createTime = block.timestamp;
+        courses[course_id].id = course_id;
+        courses[course_id].name = name;
+        courses[course_id].price = price;
+        courses[course_id].reward = reward;
+        courses[course_id].courseType = courseType;
+        courses[course_id].hashCourse = hashCourse;
+        courses[course_id].createTime = block.timestamp;
     }
 
     function checkEnrolledCourse(uint256 stu_id, uint256 course_id) public view returns (bool){
-        require(hasAccount[msg.sender], "Not authorized to enroll course");
+        require(hasAccount[students[stu_id].stuAdd], "Not authorized to enroll course");
         bool isEnrolled = false;
         for (uint256 i = 0; i < students[stu_id].courses_id.length; i++) {
             if (students[stu_id].courses_id[i] == course_id) {
@@ -114,11 +115,11 @@ contract EduManage {
         uint256 stu_id,
         uint256 course_id
         ) public payable {
-        require(hasAccount[msg.sender] , "Not authorized to enroll course"); 
-        require(!checkEnrolledCourse( stu_id, course_id), "You bought this course");
+        require(hasAccount[students[stu_id].stuAdd] , "Not authorized to enroll course"); 
+        require(!checkEnrolledCourse(stu_id, course_id), "You bought this course");
         require(courses[course_id].reward != 0,"Course does not exist");
             allowanceBuyCourse();
-            LINK.transferFrom(msg.sender, address(this), courses[course_id].price*10**decimals);
+            LINK.transferFrom(students[stu_id].stuAdd, address(this), courses[course_id].price*10**decimals);
             courses[course_id].users++;
             students[stu_id].courses_id.push(course_id);
     }
@@ -143,22 +144,21 @@ contract EduManage {
     function checkAndTransferRewardCourse(
         uint256 stu_id,
         uint256 course_id,
-        string memory image_uri_special,
-        string memory image_uri_normal
+        string memory image_uri
         ) public payable {
             require(grades[stu_id][course_id].isSet, "Please take exam");
             require(!grades[stu_id][course_id].isReceiveReward, "You have received a reward for this course");
             require(!grades[stu_id][course_id].isMintCert, "You have received a certificate for this course");
             uint256 _mark = grades[stu_id][course_id].mark; 
             if (10 >=_mark && _mark >= 9) {
-                rewardToken(msg.sender, courses[course_id].reward);
-                CertNFT.mintCertificate(msg.sender, students[stu_id].stu_name, 
-                courses[course_id].name, block.timestamp, courses[course_id].courseType, image_uri_special);
+                rewardToken(students[stu_id].stuAdd, courses[course_id].reward);
+                CertNFT.mintCertificate(students[stu_id].stuAdd, students[stu_id].stu_name, 
+                courses[course_id].name, block.timestamp, courses[course_id].courseType, image_uri);
                 grades[stu_id][course_id].isReceiveReward = true;
                 grades[stu_id][course_id].isMintCert = true;
             } else if (_mark >= 7) {
-                CertNFT.mintCertificate(msg.sender, students[stu_id].stu_name, 
-                courses[course_id].name, block.timestamp, courses[course_id].courseType, image_uri_normal);
+                CertNFT.mintCertificate(students[stu_id].stuAdd, students[stu_id].stu_name, 
+                courses[course_id].name, block.timestamp, courses[course_id].courseType, image_uri);
                 grades[stu_id][course_id].isMintCert = true;
             } else {
                 revert("Sorry, you have failed exam.");
