@@ -1,0 +1,569 @@
+[
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_tokenAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_NFTAddress",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "CertNFT",
+      "outputs": [
+        {
+          "internalType": "contract CertificateNFT",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "LINK",
+      "outputs": [
+        {
+          "internalType": "contract LINKToken",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "course_id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "reward",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "courseType",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "hashCourse",
+          "type": "string"
+        }
+      ],
+      "name": "addCourse",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "post_id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "owner_add",
+          "type": "address"
+        }
+      ],
+      "name": "addPost",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "stu_add",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "stu_id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        }
+      ],
+      "name": "addStudent",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "allowanceBuyCourse",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "stu_id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "course_id",
+          "type": "uint256"
+        }
+      ],
+      "name": "buyCourse",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "stu_id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "course_id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "image_uri",
+          "type": "string"
+        }
+      ],
+      "name": "checkAndTransferRewardCourse",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "post_id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "point",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "reject_count",
+          "type": "uint256"
+        }
+      ],
+      "name": "checkAndTransferRewardPost",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "stu_id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "course_id",
+          "type": "uint256"
+        }
+      ],
+      "name": "checkEnrolledCourse",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "decimals",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_id",
+          "type": "uint256"
+        }
+      ],
+      "name": "getCourse",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "users",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "price",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "reward",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "courseType",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "hashCourse",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "createTime",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct EduManage.Course",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getCourseCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stu_id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_course_id",
+          "type": "uint256"
+        }
+      ],
+      "name": "getGrades",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "mark",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "isSet",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "isReceiveReward",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "isMintCert",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct EduManage.Grade",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_id",
+          "type": "uint256"
+        }
+      ],
+      "name": "getPosts",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "point",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "rejectCount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "rewardCount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct EduManage.Post",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_id",
+          "type": "uint256"
+        }
+      ],
+      "name": "getStudent",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "stuAdd",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "stu_name",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256[]",
+              "name": "courses_id",
+              "type": "uint256[]"
+            }
+          ],
+          "internalType": "struct EduManage.Student",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "grades",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "mark",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "isSet",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "isReceiveReward",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "isMintCert",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "postPointToReward",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "postTokenReward",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_numberOfTokens",
+          "type": "uint256"
+        }
+      ],
+      "name": "rewardToken",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "stu_id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "course_id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_mark",
+          "type": "uint256"
+        }
+      ],
+      "name": "submitGrade",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ]

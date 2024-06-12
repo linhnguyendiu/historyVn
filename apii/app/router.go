@@ -1,14 +1,17 @@
 package app
 
 import (
-	"fmt"
 	"go-pzn-restful-api/auth"
 	"go-pzn-restful-api/controller"
 	"go-pzn-restful-api/helper"
 	"go-pzn-restful-api/middleware"
 	"go-pzn-restful-api/repository"
 	"go-pzn-restful-api/service"
+	"log"
+	"math/big"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -16,6 +19,10 @@ import (
 var (
 	jwtAuth = auth.NewJwtAuth()
 	db      = DBConnection()
+
+	// contract
+	// contractRepository = repository.NewContractRepository(db, client, authh, linkToken, certNFT, eduManage)
+	// contractService    = service.NewContractService(contractRepository)
 
 	// user
 	userRepository = repository.NewUserRepository(db)
@@ -83,6 +90,13 @@ func NewRouter() *gin.Engine {
 	helper.InitRedis()
 	DBMigrate(db)
 
+	client := helper.DialClient()
+	helper.ConnectToLINKToken()
+	// helper.ConnectToCertNFT()
+	// helper.ConnectToEduManage()
+	auth := helper.AuthGenerator(client)
+	token := helper.GetTokenInstance()
+
 	router := gin.Default()
 	router.Use(cors.Default())
 	router.Use(gin.CustomRecovery(middleware.ErrorHandler))
@@ -96,12 +110,28 @@ func NewRouter() *gin.Engine {
 		postService.ProcessPosts()
 	})
 	if err != nil {
-		fmt.Println("Error adding cron job:", err)
+		log.Println("Error adding cron job:", err)
 		return nil
 	}
 
 	// Bắt đầu cron scheduler
 	c.Start()
+
+	account := common.HexToAddress("0x5FbDB2315678afecb367f032d93F642f64180aa3")
+	value := big.NewInt(1000)
+
+	tranfer, err := token.Transfer(auth, account, value)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("BalanceOf", tranfer)
+
+	balance, err := token.BalanceOf(&bind.CallOpts{}, account)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("BalanceOf", balance)
 
 	// User endpoints
 	v1.POST("/users", userController.Register)
