@@ -1,14 +1,22 @@
 import React from "react";
 import "./index.css";
-import { Typography } from "antd";
-import SearchComp from "./comp/search";
+import { Typography, Button } from "antd";
+import SearchComp from "../../component/search";
 import Lesson from "./lesson";
 import Post from "./post";
+import Rank from "../../component/rank";
+import { useSDK } from "@metamask/sdk-react";
+
 interface Props {}
 
 const HomePage: React.FC<Props> = () => {
+  const { sdk, connected, connecting,account, provider, chainId} = useSDK();
+  const onClick =() => { 
+    console.log('check is connected', account, connected)
+
+  }
   return (
-    <div className="wrapper">
+    <div >
       <div className="big-thumb">
         <div className="big-thumb-content">
           <h1 className="bona-nova-regular-italic">
@@ -29,6 +37,8 @@ const HomePage: React.FC<Props> = () => {
             <SearchComp className="search-comp"/>
             <Lesson/>
             <Post/>
+            <Rank/>
+            <Button onClick={onClick}>Check</Button>
       </div>
     </div>
   );

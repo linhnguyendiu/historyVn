@@ -1,0 +1,5 @@
+.chart-wrapper{
+    margin: 40px 100px 40px 100px;
+    display: flex;
+    flex-direction: column;
+}

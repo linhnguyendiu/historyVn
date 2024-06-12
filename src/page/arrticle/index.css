@@ -1,0 +1,43 @@
+.article-wrapper{
+    margin: 40px 100px 40px 100px;
+    display: flex;
+    flex-direction: column;
+}
+.article-thumbnail{ 
+   display: flex;
+   justify-content: center;
+   margin-bottom: 20px;
+   img{ 
+    width: 35rem;
+    height: 20rem;
+   }
+}
+.article-title{ 
+    display: flex;
+    justify-content: space-between;
+    .title{ 
+        font-family: "Montserrat";
+        font-weight: 600;
+        font-size: 32px;
+    }
+    .article-public{ 
+        font-family: "Lexend", sans-serif;
+        font-weight: 300;
+        size: 16px;
+    }
+}
+.article-cp{ 
+    padding: 10px;
+    span{ 
+        font-family: "Lexend", sans-serif;
+        font-weight: 300;
+        size: 16px;
+        line-height: 32px;
+    }
+}
+.article-icon{
+    border: 1px solid #FF69B4;
+    padding: 3px;
+    font-size: 24px;
+    border-radius: 6px;
+}

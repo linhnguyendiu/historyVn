@@ -1,0 +1,60 @@
+.sharepage-wrapper{ 
+    margin: 40px 100px 40px 100px;
+    display: flex;
+    flex-direction: column;
+}
+.sharepage-header { 
+    display: flex;
+    justify-content: space-between;
+    .sharepage-title{ 
+        span { 
+            font-family: "Chonburi", serif;
+            font-weight: 400;
+            font-style: normal; 
+            font-size: 26px;
+        }
+    }
+}
+.post-wrapper{ 
+    display: flex;
+    flex-direction:row;
+    border: none;
+    .thumbnail-post{
+        img {
+            width: 235px;
+            border: 1px solid #E6E6FA;
+            height: 300px;
+            border-radius: 6px
+        }
+    };
+    .post-section{ 
+        display: flex;
+        flex-direction: column;
+        border: 2px solid #E6E6FA;
+        border-radius: 6px;
+        padding: 10px;
+        margin-left: 10px;
+        align-items: flex-start;
+        /* background-color: white; */
+        .post-title{ 
+            margin: 10px 0px 5px 0px;
+            span{ 
+                font-weight: bold;
+                font-family: "Be VietNam Pro";
+                font-size: 24px;
+            }
+        }
+        .post-content{ 
+            margin-top: 30px;
+            margin-bottom: 30px;
+            span{ 
+                font-family: "Be VietNam Pro";
+                font-size: 20px;
+            }
+            text-align: start;
+        }
+        .post-react{ 
+            font-size: 22px;
+        }
+    }
+}
