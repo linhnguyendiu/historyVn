@@ -12,4 +12,5 @@ type CourseController interface {
 	UserEnrolled(ctx *gin.Context)
 	UploadBanner(ctx *gin.Context)
 	GetExamScore(ctx *gin.Context)
+	GetBySlugAndCategory(ctx *gin.Context)
 }

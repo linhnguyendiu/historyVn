@@ -31,8 +31,8 @@ func (s *CourseServiceImpl) FindByCategory(categoryName string) []web.CourseResp
 
 	coursesResponse := []web.CourseResponse{}
 	for _, course := range courses {
-		countUsersEnrolled := s.CourseRepository.CountUsersEnrolled(course.Id)
-		courseResponse := helper.ToCourseResponse(course, countUsersEnrolled)
+		// countUsersEnrolled := s.CourseRepository.CountUsersEnrolled(course.Id)
+		courseResponse := helper.ToCourseResponse(course, 0)
 		coursesResponse = append(coursesResponse, courseResponse)
 	}
 
@@ -96,8 +96,8 @@ func (s *CourseServiceImpl) FindAll() []web.CourseResponse {
 
 	coursesResponse := []web.CourseResponse{}
 	for _, course := range courses {
-		countUsersEnrolled := s.CourseRepository.CountUsersEnrolled(course.Id)
-		courseResponse := helper.ToCourseResponse(course, countUsersEnrolled)
+		// countUsersEnrolled := s.CourseRepository.CountUsersEnrolled(course.Id)
+		courseResponse := helper.ToCourseResponse(course, 0)
 		coursesResponse = append(coursesResponse, courseResponse)
 	}
 
@@ -120,14 +120,38 @@ func (s *CourseServiceImpl) FindByAuthorId(authorId int) []web.CourseResponse {
 	return coursesResponse
 }
 
-func (s *CourseServiceImpl) FindBySlug(slug string) web.CourseBySlugResponse {
+func (s *CourseServiceImpl) FindBySlug(slug string) []web.CourseResponse {
 	findBySlug, err := s.CourseRepository.FindBySlug(slug)
 	if err != nil {
 		panic(helper.NewNotFoundError(err.Error()))
 	}
 
-	countUsersEnrolled := s.CourseRepository.CountUsersEnrolled(findBySlug.Id)
-	return helper.ToCourseBySlugResponse(findBySlug, countUsersEnrolled)
+	coursesResponse := []web.CourseResponse{}
+	for _, course := range findBySlug {
+		// countUsersEnrolled := s.CourseRepository.CountUsersEnrolled(course.Id)
+		courseResponse := helper.ToCourseResponse(course, 0)
+		coursesResponse = append(coursesResponse, courseResponse)
+	}
+
+	return coursesResponse
+
+}
+
+func (s *CourseServiceImpl) FindBySlugAndCategory(slug string, cateName string) []web.CourseResponse {
+	FindBySlugAndCategory, err := s.CourseRepository.FindBySlugAndCategory(slug, cateName)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	coursesResponse := []web.CourseResponse{}
+	for _, course := range FindBySlugAndCategory {
+		// countUsersEnrolled := s.CourseRepository.CountUsersEnrolled(course.Id)
+		courseResponse := helper.ToCourseResponse(course, 0)
+		coursesResponse = append(coursesResponse, courseResponse)
+	}
+
+	return coursesResponse
+
 }
 
 func (s *CourseServiceImpl) FindById(courseId int) web.CourseResponse {
@@ -148,6 +172,7 @@ func (s *CourseServiceImpl) Create(request web.CourseCreateInput) web.CourseResp
 		Description: request.Description,
 		Price:       request.Price,
 		Reward:      request.Reward,
+		Category:    request.Category,
 	}
 
 	if course.AuthorId == 0 {

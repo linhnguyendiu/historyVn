@@ -16,7 +16,7 @@ type ContractServiceImpl struct {
 func (s *ContractServiceImpl) BalanceOf(address string) (*big.Int, error) {
 	addr := common.HexToAddress(address)
 	var result []interface{}
-	callOpts := &bind.CallOpts{} // Thêm các tùy chọn gọi hàm nếu cần
+	callOpts := &bind.CallOpts{} 
 
 	err := s.ContractRepository.GetLinkToken().Call(callOpts, &result, "balanceOf", addr)
 	if err != nil {
@@ -33,6 +33,8 @@ func (s *ContractServiceImpl) BalanceOf(address string) (*big.Int, error) {
 	}
 	return balance, nil
 }
+
+
 func NewContractService(contractRepository repository.ContractRepository) ContractService {
 	return &ContractServiceImpl{
 		ContractRepository: contractRepository,

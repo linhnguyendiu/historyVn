@@ -10,7 +10,8 @@ type CourseService interface {
 	Create(request web.CourseCreateInput) web.CourseResponse
 	UploadBanner(courseId int, pathFile string) bool
 	FindById(courseId int) web.CourseResponse
-	FindBySlug(slug string) web.CourseBySlugResponse
+	FindBySlug(slug string) []web.CourseResponse
+	FindBySlugAndCategory(slug string, cateName string) []web.CourseResponse
 	FindByAuthorId(authorId int) []web.CourseResponse
 	FindByUserId(userId int) []web.CourseResponse
 	FindByCategory(categoryName string) []web.CourseResponse

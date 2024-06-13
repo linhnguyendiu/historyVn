@@ -8,10 +8,7 @@ import (
 	"go-pzn-restful-api/repository"
 	"go-pzn-restful-api/service"
 	"log"
-	"math/big"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -90,12 +87,12 @@ func NewRouter() *gin.Engine {
 	helper.InitRedis()
 	DBMigrate(db)
 
-	client := helper.DialClient()
-	helper.ConnectToLINKToken()
-	// helper.ConnectToCertNFT()
-	// helper.ConnectToEduManage()
-	auth := helper.AuthGenerator(client)
-	token := helper.GetTokenInstance()
+	// client := helper.DialClient()
+	// helper.ConnectToLINKToken()
+	// // helper.ConnectToCertNFT()
+	// // helper.ConnectToEduManage()
+	// auth := helper.AuthGenerator(client)
+	// token := helper.GetTokenInstance()
 
 	router := gin.Default()
 	router.Use(cors.Default())
@@ -117,21 +114,21 @@ func NewRouter() *gin.Engine {
 	// Bắt đầu cron scheduler
 	c.Start()
 
-	account := common.HexToAddress("0x5FbDB2315678afecb367f032d93F642f64180aa3")
-	value := big.NewInt(1000)
+	// account := common.HexToAddress("0x5FbDB2315678afecb367f032d93F642f64180aa3")
+	// value := big.NewInt(1000)
 
-	tranfer, err := token.Transfer(auth, account, value)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("BalanceOf", tranfer)
+	// tranfer, err := token.Transfer(auth, account, value)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// log.Println("BalanceOf", tranfer)
 
-	balance, err := token.BalanceOf(&bind.CallOpts{}, account)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// balance, err := token.BalanceOf(&bind.CallOpts{}, account)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	log.Println("BalanceOf", balance)
+	// log.Println("BalanceOf", balance)
 
 	// User endpoints
 	v1.POST("/users", userController.Register)
@@ -157,6 +154,7 @@ func NewRouter() *gin.Engine {
 	v1.GET("/courses/:slug", courseController.GetBySlug)
 	v1.GET("/courses", courseController.GetAll)
 	v1.GET("/courses/categories/:categoryName", courseController.GetByCategory)
+	v1.GET("/courses/slug/:slug/categories/:cateName", courseController.GetBySlugAndCategory)
 	v1.GET("/courses/enrolled", middleware.UserJwtAuthMiddleware(jwtAuth, userService), courseController.GetByUserId)
 	// keknya dibawah ini ga perlu deh, soalnya udah ada transaksi endpoint
 	v1.POST("/courses/:courseId/enrolled", middleware.UserJwtAuthMiddleware(jwtAuth, userService), courseController.UserEnrolled)

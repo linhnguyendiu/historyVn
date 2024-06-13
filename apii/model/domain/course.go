@@ -11,6 +11,7 @@ type Course struct {
 	Price        int    `gorm:"default:0;not null"`
 	Reward       int    `gorm:"default:0;not null"`
 	Banner       string
+	Category     string
 	VideoUrl     string
 	DurationQuiz int
 	QuizzesCount int

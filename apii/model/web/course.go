@@ -5,7 +5,7 @@ type CourseCreateInput struct {
 	Title        string `json:"title" binding:"required"`
 	Slug         string `json:"slug" binding:"required"`
 	Description  string `json:"description" binding:"required"`
-	Price        int    `json:"price" binding:"required"`
+	Price        int    `json:"price"`
 	Reward       int    `json:"reward" binding:"required"`
 	Category     string `json:"category" binding:"required"`
 	DurationQuiz int
@@ -21,6 +21,7 @@ type CourseResponse struct {
 	Price         int    `json:"price"`
 	Reward        int    `json:"reward"`
 	Banner        string `json:"banner"`
+	Category      string `json:"category"`
 	UsersEnrolled int    `json:"users_enrolled"`
 	DurationQuiz  int
 	QuizzesCount  int

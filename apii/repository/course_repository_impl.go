@@ -28,35 +28,40 @@ func (r *CourseRepositoryImpl) FindAllCourseIdByUserId(userId int) []string {
 }
 
 func (r *CourseRepositoryImpl) FindByCategory(categoryName string) ([]domain.Course, error) {
-	category := domain.Category{}
-	err := r.db.Find(&category, "name=?", categoryName).Error
+	// category := domain.Category{}
+	// err := r.db.Find(&category, "name=?", categoryName).Error
+
+	// courses := []domain.Course{}
+	// err = r.db.
+	// 	Joins("JOIN category_courses ON category_courses.course_id=courses.id").
+	// 	Joins("JOIN categories ON category_courses.category_id=categories.id").
+	// 	Where("categories.id=?", category.Id).
+	// 	Find(&courses).Error
+	// if len(courses) == 0 || err != nil {
+	// 	return nil, errors.New("courses not found")
+	// }
 
 	courses := []domain.Course{}
-	err = r.db.
-		Joins("JOIN category_courses ON category_courses.course_id=courses.id").
-		Joins("JOIN categories ON category_courses.category_id=categories.id").
-		Where("categories.id=?", category.Id).
-		Find(&courses).Error
+	err := r.db.Find(&courses, "category=?", categoryName).Error
 	if len(courses) == 0 || err != nil {
-		return nil, errors.New("courses not found")
+		return nil, errors.New("course not found")
 	}
-
 	return courses, nil
 }
 
-func (r *CourseRepositoryImpl) SaveToCategoryCourse(categoryName string, courseId int) bool {
-	category := domain.Category{}
-	err := r.db.Find(&category, "name=?", categoryName).Error
+// func (r *CourseRepositoryImpl) SaveToCategoryCourse(categoryName string, courseId int) bool {
+// 	category := domain.Category{}
+// 	err := r.db.Find(&category, "name=?", categoryName).Error
 
-	categoryCourse := domain.CategoryCourse{}
-	categoryCourse.CategoryId = category.Id
-	categoryCourse.CourseId = courseId
+// 	categoryCourse := domain.CategoryCourse{}
+// 	categoryCourse.CategoryId = category.Id
+// 	categoryCourse.CourseId = courseId
 
-	err = r.db.Create(&categoryCourse).Error
-	helper.PanicIfError(err)
+// 	err = r.db.Create(&categoryCourse).Error
+// 	helper.PanicIfError(err)
 
-	return true
-}
+// 	return true
+// }
 
 func (r *CourseRepositoryImpl) FindByUserId(userId int) ([]domain.Course, error) {
 	courses := []domain.Course{}
@@ -112,14 +117,22 @@ func (r *CourseRepositoryImpl) FindByAuthorId(authorId int) ([]domain.Course, er
 	return courses, nil
 }
 
-func (r *CourseRepositoryImpl) FindBySlug(slug string) (domain.Course, error) {
-	course := domain.Course{}
-	err := r.db.Preload("Author").Find(&course, "slug=?", slug).Error
-	if course.Id == 0 || err != nil {
-		return course, errors.New("course not found")
+func (r *CourseRepositoryImpl) FindBySlug(slug string) ([]domain.Course, error) {
+	courses := []domain.Course{}
+	err := r.db.Find(&courses, "slug=?", slug).Error
+	if len(courses) == 0 || err != nil {
+		return nil, errors.New("course not found")
 	}
+	return courses, nil
+}
 
-	return course, nil
+func (r *CourseRepositoryImpl) FindBySlugAndCategory(slug string, cateName string) ([]domain.Course, error) {
+	courses := []domain.Course{}
+	err := r.db.Where("slug = ? AND category = ?", slug, cateName).Find(&courses).Error
+	if len(courses) == 0 || err != nil {
+		return nil, errors.New("course not found")
+	}
+	return courses, nil
 }
 
 func (r *CourseRepositoryImpl) FindById(courseId int) (domain.Course, error) {

@@ -23,6 +23,14 @@ func (c *CourseControllerImpl) GetByCategory(ctx *gin.Context) {
 	)
 }
 
+func (c *CourseControllerImpl) GetBySlugAndCategory(ctx *gin.Context) {
+	courseResponses := c.CourseService.FindBySlugAndCategory(ctx.Param("slug"), ctx.Param("cateName"))
+
+	ctx.JSON(200,
+		helper.APIResponse(200, "List of courses", courseResponses),
+	)
+}
+
 func (c *CourseControllerImpl) GetByUserId(ctx *gin.Context) {
 	userId := ctx.MustGet("current_user").(web.UserResponse).Id
 	courseResponses := c.CourseService.FindByUserId(userId)

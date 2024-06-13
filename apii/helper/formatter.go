@@ -40,7 +40,9 @@ func ToCourseResponse(course domain.Course, countUserEnrolled int) web.CourseRes
 	courseResponse.Slug = course.Slug
 	courseResponse.Description = course.Description
 	courseResponse.Price = course.Price
+	courseResponse.Reward = course.Reward
 	courseResponse.Banner = course.Banner
+	courseResponse.Category = course.Category
 	courseResponse.UsersEnrolled = countUserEnrolled
 
 	return courseResponse
