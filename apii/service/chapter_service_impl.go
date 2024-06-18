@@ -10,6 +10,7 @@ import (
 type ChapterServiceImpl struct {
 	repository.ChapterRepository
 	CourseService
+	repository.LessonRepository
 }
 
 func (s *ChapterServiceImpl) Update(ctId int, input web.ChapterCreateInput) web.ChapterResponse {
@@ -32,8 +33,18 @@ func (s *ChapterServiceImpl) FindByCourseId(courseId int) []web.ChapterResponse 
 	if err != nil {
 		panic(helper.NewNotFoundError(err.Error()))
 	}
+	chaptersResponse := []web.ChapterResponse{}
+	for _, chapter := range chapters {
+		lessons, err := s.LessonRepository.FindByChapterId(chapter.Id)
+		if err != nil {
+			panic(helper.NewNotFoundError(err.Error()))
+		}
+		chapter.Lesson = lessons
+		chapterResponse := helper.ToChapterResponse(chapter)
+		chaptersResponse = append(chaptersResponse, chapterResponse)
+	}
 
-	return helper.ToChaptersResponse(chapters)
+	return chaptersResponse
 }
 
 func (s *ChapterServiceImpl) Create(input web.ChapterCreateInput) web.ChapterResponse {
@@ -51,9 +62,10 @@ func (s *ChapterServiceImpl) Create(input web.ChapterCreateInput) web.ChapterRes
 	return helper.ToChapterResponse(chapter)
 }
 
-func NewChapterService(chapterRepository repository.ChapterRepository, courseService CourseService) ChapterService {
+func NewChapterService(chapterRepository repository.ChapterRepository, courseService CourseService, lessonRepository repository.LessonRepository) ChapterService {
 	return &ChapterServiceImpl{
 		ChapterRepository: chapterRepository,
 		CourseService:     courseService,
+		LessonRepository:  lessonRepository,
 	}
 }

@@ -39,6 +39,13 @@ func (r *ImageCourseRepositoryImpl) FindById(ctId int) (domain.ImageCourse, erro
 	return image, nil
 }
 
+func (r *ImageCourseRepositoryImpl) Update(course domain.ImageCourse) domain.ImageCourse {
+	err := r.db.Save(&course).Error
+	helper.PanicIfError(err)
+
+	return course
+}
+
 func NewImageCourseRepository(db *gorm.DB) ImageCourseRepository {
 	return &ImageCourseRepositoryImpl{db: db}
 }

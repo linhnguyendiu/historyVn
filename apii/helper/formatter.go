@@ -32,19 +32,19 @@ func ToAuthorResponse(author domain.Author) web.AuthorResponse {
 	return authorResponse
 }
 
-func ToCourseResponse(course domain.Course, countUserEnrolled int) web.CourseResponse {
+func ToCourseResponse(course domain.Course, countUserEnrolled int, countLessons int) web.CourseResponse {
 	courseResponse := web.CourseResponse{}
 	courseResponse.Id = course.Id
 	courseResponse.AuthorId = course.AuthorId
 	courseResponse.Title = course.Title
-	courseResponse.Slug = course.Slug
+	courseResponse.Type = course.Type
 	courseResponse.Description = course.Description
 	courseResponse.Price = course.Price
 	courseResponse.Reward = course.Reward
-	courseResponse.Banner = course.Banner
 	courseResponse.Category = course.Category
+	courseResponse.DurationQuiz = course.DurationQuiz
 	courseResponse.UsersEnrolled = countUserEnrolled
-
+	courseResponse.LessonsCount = countLessons
 	return courseResponse
 }
 
@@ -92,28 +92,14 @@ func ToPostBySearchResponse(post domain.Post) web.PostBySearchResponse {
 	return postResponse
 }
 
-func ToCourseBySlugResponse(course domain.Course, countUserEnrolled int) web.CourseBySlugResponse {
-	courseResponse := web.CourseBySlugResponse{}
-	courseResponse.Id = course.Id
-	courseResponse.AuthorId = course.AuthorId
-	courseResponse.Title = course.Title
-	courseResponse.Slug = course.Slug
-	courseResponse.Description = course.Description
-	courseResponse.Price = course.Price
-	courseResponse.Banner = course.Banner
-	courseResponse.UsersEnrolled = countUserEnrolled
-	courseResponse.Author = ToAuthorResponse(course.Author)
-
-	return courseResponse
-}
-
 func ToLessonContentResponse(content domain.LessonContent) web.LessonContentResponse {
 	return web.LessonContentResponse{
 		Id:           content.Id,
 		LessonId:     content.LessonId,
+		Title:        content.Title,
 		Content:      content.Content,
 		Illustration: content.Illustration,
-		Description:  content.Description,
+		Type:         content.Type,
 		InOrder:      content.InOrder,
 	}
 }
@@ -217,6 +203,8 @@ func ToLessonResponse(title domain.Lesson) web.LessonResponse {
 		Title:        title.Title,
 		InOrder:      title.InOrder,
 		DurationTime: title.DurationTime,
+		Description:  title.Description,
+		Type:         title.Type,
 	}
 }
 
@@ -238,6 +226,7 @@ func ToChapterResponse(title domain.Chapter) web.ChapterResponse {
 		CourseId: title.CourseId,
 		Title:    title.Title,
 		InOrder:  title.InOrder,
+		Lessons:  ToLessonsResponse(title.Lesson),
 	}
 }
 
@@ -259,4 +248,24 @@ func ToChaptersResponse(titles []domain.Chapter) []web.ChapterResponse {
 	}
 
 	return chaptersResponse
+}
+
+func ToImgCourseResponse(title domain.ImageCourse) web.ImgCourseResponse {
+	return web.ImgCourseResponse{
+		Id:          title.Id,
+		CourseId:    title.CourseId,
+		Description: title.Description,
+		ImageType:   title.ImageType,
+		ImageAlt:    title.ImageAlt,
+	}
+}
+
+func ToImgCoursesResponse(imgs []domain.ImageCourse) []web.ImgCourseResponse {
+	imgsResponse := []web.ImgCourseResponse{}
+	for _, img := range imgs {
+		imgResponse := ToImgCourseResponse(img)
+		imgsResponse = append(imgsResponse, imgResponse)
+	}
+
+	return imgsResponse
 }

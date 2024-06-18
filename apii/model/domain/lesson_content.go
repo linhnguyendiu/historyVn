@@ -5,7 +5,8 @@ import "time"
 type LessonContent struct {
 	Id           int `gorm:"primaryKey"`
 	LessonId     int
-	Description  string
+	Type         int
+	Title        string
 	Content      string
 	Illustration string
 	InOrder      int       `gorm:"type:int"`

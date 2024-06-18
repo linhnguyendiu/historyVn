@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"go-pzn-restful-api/helper"
 	"go-pzn-restful-api/model/web"
 	"go-pzn-restful-api/service"
@@ -23,8 +22,8 @@ func (c *CourseControllerImpl) GetByCategory(ctx *gin.Context) {
 	)
 }
 
-func (c *CourseControllerImpl) GetBySlugAndCategory(ctx *gin.Context) {
-	courseResponses := c.CourseService.FindBySlugAndCategory(ctx.Param("slug"), ctx.Param("cateName"))
+func (c *CourseControllerImpl) GetByTypeAndCategory(ctx *gin.Context) {
+	courseResponses := c.CourseService.FindByTypeAndCategory(ctx.Param("type"), ctx.Param("cateName"))
 
 	ctx.JSON(200,
 		helper.APIResponse(200, "List of courses", courseResponses),
@@ -37,24 +36,6 @@ func (c *CourseControllerImpl) GetByUserId(ctx *gin.Context) {
 
 	ctx.JSON(200,
 		helper.APIResponse(200, "List of courses", courseResponses),
-	)
-}
-
-func (c *CourseControllerImpl) UploadBanner(ctx *gin.Context) {
-	courseStr := ctx.Param("courseId")
-	courseId, _ := strconv.Atoi(courseStr)
-	//courseId, _ := strconv.Atoi(ctx.Param("courseId"))
-
-	fileHeader, _ := ctx.FormFile("banner")
-
-	pathFile := fmt.Sprintf("assets/images/banners/%d-%s", courseId, fileHeader.Filename)
-	uploadBanner := c.CourseService.UploadBanner(courseId, pathFile)
-
-	ctx.SaveUploadedFile(fileHeader, pathFile)
-
-	ctx.JSON(200,
-		helper.APIResponse(200, "Banner is successfully uploaded",
-			gin.H{"is_uploaded": uploadBanner}),
 	)
 }
 
@@ -78,6 +59,21 @@ func (c *CourseControllerImpl) GetAll(ctx *gin.Context) {
 	)
 }
 
+func (c *CourseControllerImpl) GetByKeyword(ctx *gin.Context) {
+	courseResponses, err := c.CourseService.FindByKeyword(ctx.Param("keywords"))
+	helper.PanicIfError(err)
+	ctx.JSON(http.StatusOK,
+		helper.APIResponse(200, "List of posts", courseResponses),
+	)
+}
+
+func (c *CourseControllerImpl) GetTop3Course(ctx *gin.Context) {
+	courseResponses := c.CourseService.FindTop3Coures()
+	ctx.JSON(http.StatusOK,
+		helper.APIResponse(200, "List of top courses", courseResponses),
+	)
+}
+
 func (c *CourseControllerImpl) GetByAuthorId(ctx *gin.Context) {
 	param := ctx.Param("authorId")
 	authorId, _ := strconv.Atoi(param)
@@ -87,8 +83,8 @@ func (c *CourseControllerImpl) GetByAuthorId(ctx *gin.Context) {
 	)
 }
 
-func (c *CourseControllerImpl) GetBySlug(ctx *gin.Context) {
-	courseResponse := c.CourseService.FindBySlug(ctx.Param("slug"))
+func (c *CourseControllerImpl) GetByType(ctx *gin.Context) {
+	courseResponse := c.CourseService.FindByType(ctx.Param("type"))
 	ctx.JSON(http.StatusOK,
 		helper.APIResponse(200, "Course detail", courseResponse),
 	)

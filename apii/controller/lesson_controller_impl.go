@@ -51,6 +51,19 @@ func (c *LessonControllerImpl) Create(ctx *gin.Context) {
 		helper.APIResponse(200, "Lesson title is successfully created", lessonResponse))
 }
 
+func (c *LessonControllerImpl) UsersCompletedLesson(ctx *gin.Context) {
+	user := ctx.MustGet("current_user").(web.UserResponse)
+	lessonId, err := strconv.Atoi(ctx.Param("lessonId"))
+	helper.PanicIfError(err)
+
+	reponse := c.LessonService.UsersCompletedLesson(user.Id, lessonId)
+
+	ctx.JSON(200,
+		helper.APIResponse(200, "Success to enrolled",
+			gin.H{"enrolled_by": user.FirstName, "completed_at": reponse.CompletedAt}),
+	)
+}
+
 func NewLessonController(lessonService service.LessonService) LessonController {
 	return &LessonControllerImpl{LessonService: lessonService}
 }

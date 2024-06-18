@@ -69,8 +69,9 @@ func (s *LessonContentServiceImpl) Create(input web.LessonContentCreateInput) we
 
 	lessonContent := domain.LessonContent{}
 	lessonContent.LessonId = input.LessonId
+	lessonContent.Title = input.Title
 	lessonContent.Content = input.Content
-	lessonContent.Description = input.Description
+	lessonContent.Type = input.Type
 	lessonContent.InOrder = input.InOrder
 
 	content := s.LessonContentRepository.Save(lessonContent)

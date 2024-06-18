@@ -12,6 +12,12 @@ type LessonRepositoryImpl struct {
 	db *gorm.DB
 }
 
+func (r *LessonRepositoryImpl) UsersCompletedLesson(userLesson domain.UserLesson) domain.UserLesson {
+	err := r.db.Create(&userLesson).Error
+	helper.PanicIfError(err)
+	return userLesson
+}
+
 func (r *LessonRepositoryImpl) FindById(ltId int) (domain.Lesson, error) {
 	lesson := domain.Lesson{}
 	err := r.db.Find(&lesson, "id=?", ltId).Error

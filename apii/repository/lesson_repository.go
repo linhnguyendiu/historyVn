@@ -7,4 +7,5 @@ type LessonRepository interface {
 	FindByChapterId(chapterId int) ([]domain.Lesson, error)
 	FindById(ltId int) (domain.Lesson, error)
 	Update(title domain.Lesson) domain.Lesson
+	UsersCompletedLesson(userLesson domain.UserLesson) domain.UserLesson
 }

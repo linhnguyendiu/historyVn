@@ -28,19 +28,6 @@ func (r *CourseRepositoryImpl) FindAllCourseIdByUserId(userId int) []string {
 }
 
 func (r *CourseRepositoryImpl) FindByCategory(categoryName string) ([]domain.Course, error) {
-	// category := domain.Category{}
-	// err := r.db.Find(&category, "name=?", categoryName).Error
-
-	// courses := []domain.Course{}
-	// err = r.db.
-	// 	Joins("JOIN category_courses ON category_courses.course_id=courses.id").
-	// 	Joins("JOIN categories ON category_courses.category_id=categories.id").
-	// 	Where("categories.id=?", category.Id).
-	// 	Find(&courses).Error
-	// if len(courses) == 0 || err != nil {
-	// 	return nil, errors.New("courses not found")
-	// }
-
 	courses := []domain.Course{}
 	err := r.db.Find(&courses, "category=?", categoryName).Error
 	if len(courses) == 0 || err != nil {
@@ -48,20 +35,6 @@ func (r *CourseRepositoryImpl) FindByCategory(categoryName string) ([]domain.Cou
 	}
 	return courses, nil
 }
-
-// func (r *CourseRepositoryImpl) SaveToCategoryCourse(categoryName string, courseId int) bool {
-// 	category := domain.Category{}
-// 	err := r.db.Find(&category, "name=?", categoryName).Error
-
-// 	categoryCourse := domain.CategoryCourse{}
-// 	categoryCourse.CategoryId = category.Id
-// 	categoryCourse.CourseId = courseId
-
-// 	err = r.db.Create(&categoryCourse).Error
-// 	helper.PanicIfError(err)
-
-// 	return true
-// }
 
 func (r *CourseRepositoryImpl) FindByUserId(userId int) ([]domain.Course, error) {
 	courses := []domain.Course{}
@@ -117,18 +90,18 @@ func (r *CourseRepositoryImpl) FindByAuthorId(authorId int) ([]domain.Course, er
 	return courses, nil
 }
 
-func (r *CourseRepositoryImpl) FindBySlug(slug string) ([]domain.Course, error) {
+func (r *CourseRepositoryImpl) FindByType(typeCourse string) ([]domain.Course, error) {
 	courses := []domain.Course{}
-	err := r.db.Find(&courses, "slug=?", slug).Error
+	err := r.db.Find(&courses, "type=?", typeCourse).Error
 	if len(courses) == 0 || err != nil {
 		return nil, errors.New("course not found")
 	}
 	return courses, nil
 }
 
-func (r *CourseRepositoryImpl) FindBySlugAndCategory(slug string, cateName string) ([]domain.Course, error) {
+func (r *CourseRepositoryImpl) FindByTypeAndCategory(typeCourse string, cateName string) ([]domain.Course, error) {
 	courses := []domain.Course{}
-	err := r.db.Where("slug = ? AND category = ?", slug, cateName).Find(&courses).Error
+	err := r.db.Where("type = ? AND category = ?", typeCourse, cateName).Find(&courses).Error
 	if len(courses) == 0 || err != nil {
 		return nil, errors.New("course not found")
 	}
@@ -145,6 +118,28 @@ func (r *CourseRepositoryImpl) FindById(courseId int) (domain.Course, error) {
 	return course, nil
 }
 
+func (r *CourseRepositoryImpl) FindByKeywords(keyword string, limit int) ([]domain.Course, error) {
+	courses := []domain.Course{}
+	if err := r.db.Where("title LIKE ?", "%"+keyword+"%").Limit(limit).Find(&courses).Error; err != nil {
+		return nil, err
+	}
+	return courses, nil
+}
+
+func (r *CourseRepositoryImpl) FindTop3Course(limit int) ([]domain.Course, error) {
+	courses := []domain.Course{}
+	if err := r.db.Table("courses").
+		Select("courses.*, COUNT(user_courses.course_id) as enroll_count").
+		Joins("left join user_courses on user_courses.course_id = courses.id").
+		Group("courses.id").
+		Order("enroll_count DESC").
+		Limit(limit).
+		Find(&courses).Error; err != nil {
+		return nil, err
+	}
+	return courses, nil
+}
+
 func (r *CourseRepositoryImpl) GetTotalQuestionsByCourseId(courseId int) (int64, error) {
 	var count int64
 	err := r.db.Model(&domain.Question{}).Where("course_id = ?", courseId).Count(&count).Error
@@ -152,6 +147,17 @@ func (r *CourseRepositoryImpl) GetTotalQuestionsByCourseId(courseId int) (int64,
 		return 0, errors.New("course not found")
 	}
 	return count, nil
+}
+
+func (r *CourseRepositoryImpl) CountTotalLessonsInCourse(courseID int) (int, error) {
+	var count int64
+	if err := r.db.Model(&domain.Lesson{}).
+		Joins("left join chapters on chapters.id = lessons.chapter_id").
+		Where("chapters.course_id = ?", courseID).
+		Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return int(count), nil
 }
 
 func (r *CourseRepositoryImpl) SaveResult(examResult domain.ExamResult) domain.ExamResult {

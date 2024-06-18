@@ -8,10 +8,10 @@ import (
 
 type CourseService interface {
 	Create(request web.CourseCreateInput) web.CourseResponse
-	UploadBanner(courseId int, pathFile string) bool
+	FindByKeyword(query string) ([]web.CourseResponse, error)
 	FindById(courseId int) web.CourseResponse
-	FindBySlug(slug string) []web.CourseResponse
-	FindBySlugAndCategory(slug string, cateName string) []web.CourseResponse
+	FindByType(typeCourse string) []web.CourseResponse
+	FindByTypeAndCategory(typeCourse string, cateName string) []web.CourseResponse
 	FindByAuthorId(authorId int) []web.CourseResponse
 	FindByUserId(userId int) []web.CourseResponse
 	FindByCategory(categoryName string) []web.CourseResponse
@@ -19,4 +19,5 @@ type CourseService interface {
 	UserEnrolled(userId int, courseId int) domain.UserCourse
 	FindAllCourseIdByUserId(userId int) []string
 	GetScore(ctx context.Context, request web.ExamRequest) web.ExamResultResponse
+	FindTop3Coures() []web.CourseResponse
 }

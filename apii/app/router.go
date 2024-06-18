@@ -36,6 +36,10 @@ var (
 	courseService    = service.NewCourseService(courseRepository, optionRepository, examResultRepository)
 	courseController = controller.NewCourseController(courseService)
 
+	imageCourseRepository = repository.NewImageCourseRepository(db)
+	imageCourseService    = service.NewImageCourseService(imageCourseRepository, courseRepository)
+	imageCourseController = controller.NewImageCourseController(imageCourseService)
+
 	// post
 	postRepository = repository.NewPostRepository(db)
 	postService    = service.NewPostService(postRepository, commentRepository, commentService, userService)
@@ -53,7 +57,7 @@ var (
 
 	// chapter
 	chapterRepository = repository.NewChapterRepository(db)
-	chapterService    = service.NewChapterService(chapterRepository, courseService)
+	chapterService    = service.NewChapterService(chapterRepository, courseService, lessonRepository)
 	chapterController = controller.NewChapterController(chapterService)
 
 	// question
@@ -149,17 +153,23 @@ func NewRouter() *gin.Engine {
 
 	// Course endpoints
 	v1.POST("/courses", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), courseController.Create)
-	v1.PUT("/courses/:courseId/banners", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), courseController.UploadBanner)
+	// v1.PUT("/courses/:courseId/banners", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), courseController.UploadBanner)
 	v1.GET("/courses/authors/:authorId", courseController.GetByAuthorId)
-	v1.GET("/courses/:slug", courseController.GetBySlug)
+	v1.GET("/courses/type/:type", courseController.GetByType)
 	v1.GET("/courses", courseController.GetAll)
+	v1.GET("/courses/special", courseController.GetTop3Course)
 	v1.GET("/courses/categories/:categoryName", courseController.GetByCategory)
-	v1.GET("/courses/slug/:slug/categories/:cateName", courseController.GetBySlugAndCategory)
+	v1.GET("/courses/:keywords", courseController.GetByKeyword)
+	v1.GET("/courses/type/:type/categories/:cateName", courseController.GetByTypeAndCategory)
 	v1.GET("/courses/enrolled", middleware.UserJwtAuthMiddleware(jwtAuth, userService), courseController.GetByUserId)
 	// keknya dibawah ini ga perlu deh, soalnya udah ada transaksi endpoint
 	v1.POST("/courses/:courseId/enrolled", middleware.UserJwtAuthMiddleware(jwtAuth, userService), courseController.UserEnrolled)
 
 	v1.POST("/courses/:courseId/exam-result", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), courseController.GetExamScore)
+
+	v1.POST("/courses/:courseId/img", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), imageCourseController.Create)
+	v1.PUT("/courses/img/:imgId/imgAlt", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), imageCourseController.UploadImg)
+	v1.GET("/courses/img/:courseId", imageCourseController.GetByCourseId)
 
 	// Post endpoints
 	v1.POST("/posts", middleware.UserJwtAuthMiddleware(jwtAuth, userService), postController.Create)
@@ -199,6 +209,7 @@ func NewRouter() *gin.Engine {
 	// Lesson title endpoints
 	v1.POST("/authors/courses/:courseId/chapter/:chapterId/lesson-titles", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), lessonController.Create)
 	v1.PATCH("/authors/courses/:courseId/lesson-titles/:ltId", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), lessonController.Update)
+	v1.GET("/lesson-complete/lesson-titles/:lessonId", middleware.UserJwtAuthMiddleware(jwtAuth, userService), lessonController.UsersCompletedLesson)
 	v1.GET("/courses/enrolled/:courseId/chapter/:chapterId/lesson-titles", lessonController.GetByChapterId)
 
 	// Lesson content endpoints

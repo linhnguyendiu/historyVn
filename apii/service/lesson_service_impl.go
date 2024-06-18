@@ -36,12 +36,30 @@ func (s *LessonServiceImpl) FindByChapterId(chapterId int) []web.LessonResponse 
 	return helper.ToLessonsResponse(lessons)
 }
 
+func (s *LessonServiceImpl) UsersCompletedLesson(userId int, lessonId int) domain.UserLesson {
+	_, err := s.LessonRepository.FindById(lessonId)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	userLesson := domain.UserLesson{
+		LessonId: lessonId,
+		UserId:   userId,
+	}
+
+	usersCompletedLesson := s.LessonRepository.UsersCompletedLesson(userLesson)
+
+	return usersCompletedLesson
+}
+
 func (s *LessonServiceImpl) Create(input web.LessonCreateInput) web.LessonResponse {
 	lt := domain.Lesson{}
 	lt.ChapterId = input.ChapterId
 	lt.Title = input.Title
 	lt.InOrder = input.InOrder
 	lt.DurationTime = input.DurationTime
+	lt.Description = input.Description
+	lt.Type = input.Type
 
 	course := s.CourseService.FindById(input.CourseId)
 	if course.AuthorId != input.AuthorId {

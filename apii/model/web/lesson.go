@@ -5,7 +5,9 @@ type LessonCreateInput struct {
 	CourseId     int
 	Title        string `json:"title" binding:"required"`
 	InOrder      int    `json:"in_order" binding:"required"`
-	DurationTime int    `json:"duration_time" binding:"required"`
+	DurationTime int    `json:"duration_time"`
+	Description  string `json:"description" binding:"required"`
+	Type         int    `json:"type" binding:"required"`
 	AuthorId     int
 }
 
@@ -15,4 +17,6 @@ type LessonResponse struct {
 	Title        string `json:"title"`
 	InOrder      int    `json:"in_order"`
 	DurationTime int    `json:"duration_time"`
+	Description  string `json:"description"`
+	Type         int    `json:"type"`
 }

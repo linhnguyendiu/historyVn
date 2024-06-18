@@ -6,4 +6,5 @@ type LessonController interface {
 	Create(ctx *gin.Context)
 	GetByChapterId(ctx *gin.Context)
 	Update(ctx *gin.Context)
+	UsersCompletedLesson(ctx *gin.Context)
 }

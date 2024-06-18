@@ -8,8 +8,9 @@ type ChapterCreateInput struct {
 }
 
 type ChapterResponse struct {
-	Id       int    `json:"id"`
-	CourseId int    `json:"course_id"`
-	Title    string `json:"title"`
-	InOrder  int    `json:"in_order"`
+	Id       int              `json:"id"`
+	CourseId int              `json:"course_id"`
+	Title    string           `json:"title"`
+	InOrder  int              `json:"in_order"`
+	Lessons  []LessonResponse `json:"lessons"`
 }
