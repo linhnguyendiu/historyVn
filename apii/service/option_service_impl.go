@@ -30,25 +30,25 @@ func (s *OptionServiceImpl) FindByQuestionId(qsId int) []web.OptionResponse {
 	return helper.ToOptionsResponse(options)
 }
 
-func (s *OptionServiceImpl) Create(input web.OptionCreateInput) web.OptionResponse {
-	course := s.CourseService.FindById(input.CourseId)
-	if course.AuthorId != input.AuthorId {
-		panic(helper.NewUnauthorizedError("You're not an author of this courses"))
+	func (s *OptionServiceImpl) Create(input web.OptionCreateInput) web.OptionResponse {
+		course := s.CourseService.FindById(input.CourseId)
+		if course.AuthorId != input.AuthorId {
+			panic(helper.NewUnauthorizedError("You're not an author of this courses"))
+		}
+
+		option := domain.Option{}
+		option.QuestionId = input.QuestionId
+		option.Content = input.Content
+		option.IsCorrect = input.IsCorrect
+
+		content := s.OptionRepository.Save(option)
+		//if err != nil {
+		//	os.Remove(input.Content)
+		//	helper.PanicIfError(err)
+		//}
+
+		return helper.ToOptionResponse(content)
 	}
-
-	option := domain.Option{}
-	option.QuestionId = input.QuestionId
-	option.Content = input.Content
-	option.IsCorrect = input.IsCorrect
-
-	content := s.OptionRepository.Save(option)
-	//if err != nil {
-	//	os.Remove(input.Content)
-	//	helper.PanicIfError(err)
-	//}
-
-	return helper.ToOptionResponse(content)
-}
 
 func NewOptionService(optionRepository repository.OptionRepository, courseService CourseService) OptionService {
 	return &OptionServiceImpl{

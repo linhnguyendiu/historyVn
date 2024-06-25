@@ -11,6 +11,9 @@ import (
 type LessonContentServiceImpl struct {
 	repository.LessonContentRepository
 	CourseService
+	LessonService
+	ChapterService
+	repository.CourseRepository
 }
 
 func (s *LessonContentServiceImpl) FindById(lcId int) web.LessonContentResponse {
@@ -31,56 +34,49 @@ func (s *LessonContentServiceImpl) FindByLessonId(ltId int) []web.LessonContentR
 	return helper.ToLessonContentsResponse(lessonContents)
 }
 
-// func (s *LessonContentServiceImpl) Update(lcId int, input web.LessonContentUpdateInput) web.LessonContentResponse {
-// 	course := s.CourseService.FindById(input.CourseId)
-// 	if course.AuthorId != input.AuthorId {
-// 		panic(helper.NewUnauthorizedError("You're not an author of this courses"))
-// 	}
+func (s *LessonContentServiceImpl) Create(input web.ListLessonContentCreateInput) []web.LessonContentResponse {
+	lessonContentsResponse := []web.LessonContentResponse{}
 
-// 	findById, err := s.LessonContentRepository.FindById(lcId)
-// 	oldContent := findById.Content
-// 	if err != nil {
-// 		panic(helper.NewNotFoundError(err.Error()))
-// 	}
+	lesson := s.LessonService.FindById(input.LessonId)
 
-// 	if input.InOrder != 0 {
-// 		findById.InOrder = input.InOrder
-// 	}
+	chapter := s.ChapterService.FindById(lesson.ChapterId)
 
-// 	if input.Content != "" {
-// 		findById.Content = input.Content
-// 		findById.Duration = helper.GetLessonContentVideoDuration(input.Content)
-// 		lessonContent := s.LessonContentRepository.Update(findById)
-// 		if oldContent != lessonContent.Content {
-// 			os.Remove(oldContent)
-// 		}
-// 		return helper.ToLessonContentResponse(lessonContent)
-// 	}
+	course, err := s.CourseRepository.FindById(chapter.CourseId)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
 
-// 	lessonContent := s.LessonContentRepository.Update(findById)
-// 	return helper.ToLessonContentResponse(lessonContent)
-// }
-
-func (s *LessonContentServiceImpl) Create(input web.LessonContentCreateInput) web.LessonContentResponse {
-	course := s.CourseService.FindById(input.CourseId)
 	if course.AuthorId != input.AuthorId {
 		panic(helper.NewUnauthorizedError("You're not an author of this courses"))
 	}
 
-	lessonContent := domain.LessonContent{}
-	lessonContent.LessonId = input.LessonId
-	lessonContent.Title = input.Title
-	lessonContent.Content = input.Content
-	lessonContent.Type = input.Type
-	lessonContent.InOrder = input.InOrder
+	for _, lessonContentInput := range input.LessonContents {
+		lessonContent := domain.LessonContent{
+			LessonId:     input.LessonId,
+			Title:        lessonContentInput.Title,
+			Content:      lessonContentInput.Content,
+			Type:         lessonContentInput.Type,
+			InOrder:      lessonContentInput.InOrder,
+			Illustration: lessonContentInput.Illustration,
+		}
+		savedLessonContent := s.LessonContentRepository.Save(lessonContent)
+		lessonContentResponse := helper.ToLessonContentResponse(savedLessonContent)
+		lessonContentsResponse = append(lessonContentsResponse, lessonContentResponse)
+	}
 
-	content := s.LessonContentRepository.Save(lessonContent)
-	//if err != nil {
-	//	os.Remove(input.Content)
-	//	helper.PanicIfError(err)
-	//}
+	lessonHash, err := helper.GenerateSHA256Hash(lessonContentsResponse)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
 
-	return helper.ToLessonContentResponse(content)
+	combinedHash, err := helper.GenerateSHA256Hash(course.HashCourse + lessonHash)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+	course.HashCourse = combinedHash
+	s.CourseRepository.Update(course)
+
+	return lessonContentsResponse
 }
 
 func (s *LessonContentServiceImpl) UploadIllustration(lcId int, pathFile string) bool {
@@ -106,9 +102,12 @@ func updateWhenUploadIllustration(lessonContent domain.LessonContent, pathFile s
 	return true
 }
 
-func NewLessonContentService(lessonContentRepository repository.LessonContentRepository, courseService CourseService) LessonContentService {
+func NewLessonContentService(lessonContentRepository repository.LessonContentRepository, courseService CourseService, lessonService LessonService, chapterService ChapterService, courseRepository repository.CourseRepository) LessonContentService {
 	return &LessonContentServiceImpl{
 		LessonContentRepository: lessonContentRepository,
 		CourseService:           courseService,
+		LessonService:           lessonService,
+		ChapterService:          chapterService,
+		CourseRepository:        courseRepository,
 	}
 }

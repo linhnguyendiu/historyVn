@@ -10,4 +10,5 @@ type LessonService interface {
 	FindByChapterId(chapterId int) []web.LessonResponse
 	Update(ltId int, input web.LessonCreateInput) web.LessonResponse
 	UsersCompletedLesson(userId int, lessonId int) domain.UserLesson
+	FindById(lessonId int) web.LessonResponse
 }

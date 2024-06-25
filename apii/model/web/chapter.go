@@ -5,6 +5,7 @@ type ChapterCreateInput struct {
 	Title    string `json:"title" binding:"required"`
 	InOrder  int    `json:"in_order" binding:"required"`
 	AuthorId int
+	Lessons  []LessonCreateInput `json:"lessons"`
 }
 
 type ChapterResponse struct {

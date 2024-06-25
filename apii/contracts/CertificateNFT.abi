@@ -562,6 +562,11 @@
     {
       "inputs": [
         {
+          "internalType": "uint256",
+          "name": "newTokenId",
+          "type": "uint256"
+        },
+        {
           "internalType": "address",
           "name": "recipient",
           "type": "address"

@@ -6,4 +6,5 @@ type QuestionService interface {
 	Create(title web.QuestionCreateInput) web.QuestionResponse
 	FindByCourseId(courseId int) []web.QuestionResponse
 	FindById(qsId int) web.QuestionResponse
+	CreateWithOptions(input web.ListQuestionCreateInput) []web.QuestionResponse
 }

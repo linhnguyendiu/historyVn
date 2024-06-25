@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go-pzn-restful-api/helper"
 	"go-pzn-restful-api/model/domain"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -14,7 +15,7 @@ type CourseRepositoryImpl struct {
 }
 
 func (r *CourseRepositoryImpl) FindAllCourseIdByUserId(userId int) []string {
-	userCourses := []domain.UserCourse{}
+	userCourses := []domain.ExamResult{}
 	err := r.db.Select("course_id").Find(&userCourses, "user_id=?", userId).Error
 	helper.PanicIfError(err)
 
@@ -39,11 +40,13 @@ func (r *CourseRepositoryImpl) FindByCategory(categoryName string) ([]domain.Cou
 func (r *CourseRepositoryImpl) FindByUserId(userId int) ([]domain.Course, error) {
 	courses := []domain.Course{}
 	err := r.db.
-		Joins("JOIN user_courses ON user_courses.course_id=courses.id").
-		Joins("JOIN users ON users.id=user_courses.user_id").
-		Where("users.id=?", userId).
+		Joins("JOIN exam_results ON exam_results.course_id = courses.id").
+		Where("exam_results.user_id = ?", userId).
 		Find(&courses).Error
-	if len(courses) == 0 || err != nil {
+	if err != nil {
+		return nil, err
+	}
+	if len(courses) == 0 {
 		return nil, errors.New("courses not found")
 	}
 	return courses, nil
@@ -129,10 +132,7 @@ func (r *CourseRepositoryImpl) FindByKeywords(keyword string, limit int) ([]doma
 func (r *CourseRepositoryImpl) FindTop3Course(limit int) ([]domain.Course, error) {
 	courses := []domain.Course{}
 	if err := r.db.Table("courses").
-		Select("courses.*, COUNT(user_courses.course_id) as enroll_count").
-		Joins("left join user_courses on user_courses.course_id = courses.id").
-		Group("courses.id").
-		Order("enroll_count DESC").
+		Order("users_enrolled DESC").
 		Limit(limit).
 		Find(&courses).Error; err != nil {
 		return nil, err
@@ -147,6 +147,42 @@ func (r *CourseRepositoryImpl) GetTotalQuestionsByCourseId(courseId int) (int64,
 		return 0, errors.New("course not found")
 	}
 	return count, nil
+}
+
+func (r *CourseRepositoryImpl) CountCompletedLessonsByUserInCourse(userId int, courseId int) (int64, error) {
+	var count int64
+	err := r.db.Table("user_lessons").
+		Joins("JOIN lessons ON lessons.id = user_lessons.lesson_id").
+		Joins("JOIN chapters ON chapters.id = lessons.chapter_id").
+		Joins("JOIN courses ON courses.id = chapters.course_id").
+		Where("user_lessons.user_id = ? AND courses.id = ?", userId, courseId).
+		Where("user_lessons.completed_at <= ?", time.Now()).
+		Count(&count).Error
+	return count, err
+}
+
+func (r *CourseRepositoryImpl) CalculateTotalDuration(courseId int) (int, error) {
+	var totalDuration int
+	var course domain.Course
+
+	// Tìm khoá học
+	if err := r.db.First(&course, courseId).Error; err != nil {
+		return 0, err
+	}
+
+	// Tính tổng thời gian học của tất cả các bài học trong khoá học
+	if err := r.db.Model(&domain.Lesson{}).
+		Select("SUM(duration_time)").
+		Joins("JOIN chapters ON lessons.chapter_id = chapters.id").
+		Where("chapters.course_id = ?", courseId).
+		Scan(&totalDuration).Error; err != nil {
+		return 0, err
+	}
+
+	// Thêm thời gian quiz
+	totalDuration += course.DurationQuiz
+
+	return totalDuration, nil
 }
 
 func (r *CourseRepositoryImpl) CountTotalLessonsInCourse(courseID int) (int, error) {

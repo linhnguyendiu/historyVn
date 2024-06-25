@@ -8,7 +8,9 @@ import (
 	"go-pzn-restful-api/repository"
 	"go-pzn-restful-api/service"
 	"log"
+	"math/big"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -33,7 +35,7 @@ var (
 
 	// course
 	courseRepository = repository.NewCourseRepository(db)
-	courseService    = service.NewCourseService(courseRepository, optionRepository, examResultRepository)
+	courseService    = service.NewCourseService(courseRepository, optionRepository, examResultRepository, imageCourseRepository, chapterRepository, lessonRepository, userRepository, certificateRepository)
 	courseController = controller.NewCourseController(courseService)
 
 	imageCourseRepository = repository.NewImageCourseRepository(db)
@@ -63,7 +65,7 @@ var (
 	// question
 	questionRepository   = repository.NewQuestionRepository(db)
 	examResultRepository = repository.NewExamResultRepository(db)
-	questionService      = service.NewQuestionService(questionRepository, courseService, optionRepository)
+	questionService      = service.NewQuestionService(questionRepository, courseService, optionRepository, courseRepository)
 	questionController   = controller.NewQuestionController(questionService)
 
 	// option
@@ -78,12 +80,13 @@ var (
 
 	// lesson_content
 	lessonContentRepository = repository.NewLessonContentRepository(db)
-	lessonContentService    = service.NewLessonContentService(lessonContentRepository, courseService)
+	lessonContentService    = service.NewLessonContentService(lessonContentRepository, courseService, lessonService, chapterService, courseRepository)
 	lessonContentController = controller.NewLessonContentController(lessonContentService)
 
-	transactionController = controller.NewTransactionController(
-		service.NewTransactionService(repository.NewTransactionRepository(db), courseService),
-	)
+	// certificate
+	certificateRepository = repository.NewCertificateRepository(db)
+	certificateService    = service.NewCertificateService(certificateRepository)
+	certificateController = controller.NewCertificateController(certificateService)
 )
 
 func NewRouter() *gin.Engine {
@@ -91,12 +94,13 @@ func NewRouter() *gin.Engine {
 	helper.InitRedis()
 	DBMigrate(db)
 
-	// client := helper.DialClient()
-	// helper.ConnectToLINKToken()
-	// // helper.ConnectToCertNFT()
-	// // helper.ConnectToEduManage()
-	// auth := helper.AuthGenerator(client)
+	// Client := helper.DialClient()
+	helper.ConnectToLINKToken()
+	helper.ConnectToCertNFT()
+	helper.ConnectToEduManage()
+	auth := helper.AuthGenerator(helper.Client)
 	// token := helper.GetTokenInstance()
+	// manage := helper.GetEduManageInstance()
 
 	router := gin.Default()
 	router.Use(cors.Default())
@@ -118,21 +122,67 @@ func NewRouter() *gin.Engine {
 	// Bắt đầu cron scheduler
 	c.Start()
 
-	// account := common.HexToAddress("0x5FbDB2315678afecb367f032d93F642f64180aa3")
-	// value := big.NewInt(1000)
+	account := common.HexToAddress("0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0")
+	value := big.NewInt(100000000000)
 
-	// tranfer, err := token.Transfer(auth, account, value)
+	tranfer, err := helper.Token.Transfer(auth, account, value)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("BalanceOf", tranfer)
+
+	addMinter, err := helper.Cert.AddMinter(auth, account)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("BalanceOf", addMinter)
+
+	// add, err := helper.Manage.AddStudent(auth, account, big.NewInt(1), "LINH")
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
-	// log.Println("BalanceOf", tranfer)
+	// log.Println("BalanceOf", add)
 
-	// balance, err := token.BalanceOf(&bind.CallOpts{}, account)
+	// add2, err := helper.Manage.AddStudent(auth, account, big.NewInt(1), "LINH")
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
+	// log.Println("BalanceOf", add2)
+	// log.Println("BalanceOf", token)
 
-	// log.Println("BalanceOf", balance)
+	// srv, err := helper.NewDriveService()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// log.Printf("srv", srv)
+
+	// Step 1: Open  file
+	// f, err := os.Open("app/test.txt")
+
+	// if err != nil {
+	// 	panic(fmt.Sprintf("cannot open file: %v", err))
+	// }
+
+	// defer f.Close()
+
+	// file, err := helper.CreateFile(f.Name(), "application/octet-stream", "app/test.txt")
+	// if err != nil {
+	// 	panic(fmt.Sprintf("cannot put file: %v", err))
+	// }
+
+	// log.Println("BalanceOf", file)
+	// Step 2: Get the Google Drive service
+
+	// Step 3: Create directory
+	// dir, err := createFolder(srv, "New Folder", "root")
+
+	// if err != nil {
+	// 	panic(fmt.Sprintf("Could not create dir: %v\n", err))
+	// }
+
+	//give your folder id here in which you want to upload or create new directory
+
+	// Step 4: create the file and upload
 
 	// User endpoints
 	v1.POST("/users", userController.Register)
@@ -151,6 +201,8 @@ func NewRouter() *gin.Engine {
 	// Category endpoints
 	v1.POST("/categories", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), categoryController.Create)
 
+	v1.POST("/certificates", certificateController.Create)
+
 	// Course endpoints
 	v1.POST("/courses", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), courseController.Create)
 	// v1.PUT("/courses/:courseId/banners", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), courseController.UploadBanner)
@@ -162,14 +214,19 @@ func NewRouter() *gin.Engine {
 	v1.GET("/courses/:keywords", courseController.GetByKeyword)
 	v1.GET("/courses/type/:type/categories/:cateName", courseController.GetByTypeAndCategory)
 	v1.GET("/courses/enrolled", middleware.UserJwtAuthMiddleware(jwtAuth, userService), courseController.GetByUserId)
-	// keknya dibawah ini ga perlu deh, soalnya udah ada transaksi endpoint
+	v1.POST("/courses/:courseId/enrollCourse", middleware.UserJwtAuthMiddleware(jwtAuth, userService), courseController.EnrollCourse)
+
 	v1.POST("/courses/:courseId/enrolled", middleware.UserJwtAuthMiddleware(jwtAuth, userService), courseController.UserEnrolled)
 
-	v1.POST("/courses/:courseId/exam-result", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), courseController.GetExamScore)
+	v1.POST("/courses/:courseId/exam-score", middleware.UserJwtAuthMiddleware(jwtAuth, userService), courseController.GetExamScore)
 
 	v1.POST("/courses/:courseId/img", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), imageCourseController.Create)
+	v1.GET("/c/:courseId/result-exam", middleware.UserJwtAuthMiddleware(jwtAuth, userService), courseController.GetResultByUserId)
+
 	v1.PUT("/courses/img/:imgId/imgAlt", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), imageCourseController.UploadImg)
 	v1.GET("/courses/img/:courseId", imageCourseController.GetByCourseId)
+
+	v1.GET("/course-complete/course/:courseId", middleware.UserJwtAuthMiddleware(jwtAuth, userService), courseController.UsersCompletedCourse)
 
 	// Post endpoints
 	v1.POST("/posts", middleware.UserJwtAuthMiddleware(jwtAuth, userService), postController.Create)
@@ -201,6 +258,7 @@ func NewRouter() *gin.Engine {
 	v1.POST("/authors/courses/:courseId/questions", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), questionController.Create)
 	v1.GET("/courses/enrolled/:courseId/questions", questionController.GetByCourseId)
 	v1.GET("/courses/enrolled/:courseId/question/:questionId", questionController.GetByQuestionId)
+	v1.POST("/authors/courses/:courseId/questionswithoption", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), questionController.CreateQuestionWithOptions)
 
 	// Option title endpoints
 	v1.POST("/authors/courses/:courseId/question/:questionId/option", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), optionController.Create)
@@ -213,19 +271,13 @@ func NewRouter() *gin.Engine {
 	v1.GET("/courses/enrolled/:courseId/chapter/:chapterId/lesson-titles", lessonController.GetByChapterId)
 
 	// Lesson content endpoints
-	v1.POST("/authors/courses/:courseId/lesson-titles/:ltId/lesson-contents", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), lessonContentController.Create)
+	v1.POST("/authors/lesson-titles/:ltId/lesson-contents", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), lessonContentController.Create)
 	v1.PUT("/authors/lesson-content/:lcId/illustrations", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), lessonContentController.UploadIllustration)
 	// v1.PATCH("/authors/courses/:courseId/lesson-contents/:lcId", middleware.AuthorJwtAuthMiddleware(jwtAuth, authorService), lessonContentController.Update)
-	v1.GET("/c/:courseId/lesson-titles/:ltId/lesson-contents", lessonContentController.GetByLessonId)
-	v1.GET("/c/:courseId/lesson-contents/:lcId",
-		middleware.UserJwtAuthMiddleware(jwtAuth, userService),
-		middleware.MidtransPaymentMiddleware(courseService),
-		lessonContentController.GetById,
-	)
+	v1.GET("/course/:courseId/lesson/:ltId/lesson-contents", middleware.UserJwtAuthMiddleware(jwtAuth, userService),
+		middleware.MidtransPaymentMiddleware(courseService), lessonContentController.GetByLessonId)
 
 	// transaction endpoints
-	v1.POST("/courses/:courseId/transactions", middleware.UserJwtAuthMiddleware(jwtAuth, userService), transactionController.EarnPaidCourse)
-	v1.POST("/transactions/notifications", transactionController.MidtransNotification)
 
 	return router
 }

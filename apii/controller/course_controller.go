@@ -14,4 +14,7 @@ type CourseController interface {
 	GetByKeyword(ctx *gin.Context)
 	GetExamScore(ctx *gin.Context)
 	GetByTypeAndCategory(ctx *gin.Context)
+	UsersCompletedCourse(ctx *gin.Context)
+	EnrollCourse(ctx *gin.Context)
+	GetResultByUserId(ctx *gin.Context)
 }

@@ -62,6 +62,16 @@ func (s *ChapterServiceImpl) Create(input web.ChapterCreateInput) web.ChapterRes
 	return helper.ToChapterResponse(chapter)
 }
 
+func (s *ChapterServiceImpl) FindById(lessonId int) web.ChapterResponse {
+	findById, err := s.ChapterRepository.FindById(lessonId)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	return helper.ToChapterResponse(findById)
+	//return helper.ToCourseResponse(findById, countUsersEnrolled)
+}
+
 func NewChapterService(chapterRepository repository.ChapterRepository, courseService CourseService, lessonRepository repository.LessonRepository) ChapterService {
 	return &ChapterServiceImpl{
 		ChapterRepository: chapterRepository,

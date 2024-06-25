@@ -4,6 +4,7 @@ type ImgCourseRequest struct {
 	CourseId    int
 	ImageType   int    `json:"image_type" binding:"required"`
 	Description string `json:"description" binding:"required"`
+	ImageAlt    string `json:"image_alt" binding:"required"`
 }
 
 type ImgCourseResponse struct {

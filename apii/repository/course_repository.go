@@ -21,6 +21,8 @@ type CourseRepository interface {
 	CountUsersEnrolled(courseId int) int
 	FindAllCourseIdByUserId(userId int) []string
 	GetTotalQuestionsByCourseId(courseID int) (int64, error)
+	CountCompletedLessonsByUserInCourse(userId int, courseId int) (int64, error)
 	CountTotalLessonsInCourse(courseID int) (int, error)
 	SaveResult(examResult domain.ExamResult) domain.ExamResult
+	CalculateTotalDuration(courseId int) (int, error)
 }

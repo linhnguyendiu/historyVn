@@ -16,6 +16,55 @@
       "type": "constructor"
     },
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "course",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "date",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "cerType",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "imageUri",
+          "type": "string"
+        }
+      ],
+      "name": "CertificateMinted",
+      "type": "event"
+    },
+    {
       "inputs": [],
       "name": "CertNFT",
       "outputs": [
@@ -164,6 +213,11 @@
           "type": "uint256"
         },
         {
+          "internalType": "uint256",
+          "name": "token_id",
+          "type": "uint256"
+        },
+        {
           "internalType": "string",
           "name": "image_uri",
           "type": "string"
@@ -184,11 +238,6 @@
         {
           "internalType": "uint256",
           "name": "point",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "reject_count",
           "type": "uint256"
         }
       ],
@@ -331,6 +380,11 @@
               "type": "uint256"
             },
             {
+              "internalType": "string",
+              "name": "hashResultExam",
+              "type": "string"
+            },
+            {
               "internalType": "bool",
               "name": "isSet",
               "type": "bool"
@@ -462,6 +516,11 @@
           "type": "uint256"
         },
         {
+          "internalType": "string",
+          "name": "hashResultExam",
+          "type": "string"
+        },
+        {
           "internalType": "bool",
           "name": "isSet",
           "type": "bool"
@@ -553,6 +612,11 @@
           "internalType": "uint256",
           "name": "_mark",
           "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "hash_result_exam",
+          "type": "string"
         }
       ],
       "name": "submitGrade",

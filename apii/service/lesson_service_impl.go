@@ -70,6 +70,16 @@ func (s *LessonServiceImpl) Create(input web.LessonCreateInput) web.LessonRespon
 	return helper.ToLessonResponse(lesson)
 }
 
+func (s *LessonServiceImpl) FindById(lessonId int) web.LessonResponse {
+	findById, err := s.LessonRepository.FindById(lessonId)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	return helper.ToLessonResponse(findById)
+	//return helper.ToCourseResponse(findById, countUsersEnrolled)
+}
+
 func NewLessonService(lessonRepository repository.LessonRepository, courseService CourseService) LessonService {
 	return &LessonServiceImpl{
 		LessonRepository: lessonRepository,

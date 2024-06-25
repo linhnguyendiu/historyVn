@@ -7,8 +7,11 @@ import (
 	"go-pzn-restful-api/model/domain"
 	"go-pzn-restful-api/model/web"
 	"go-pzn-restful-api/repository"
+	"log"
+	"math/big"
 	"os"
 
+	"github.com/ethereum/go-ethereum/common"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -103,6 +106,13 @@ func (s *UserServiceImpl) Register(input web.UserRegisterInput) web.UserResponse
 	}
 	save := s.UserRepository.Save(domainUser)
 	helper.PanicIfError(err)
+
+	auth := helper.AuthGenerator(helper.Client)
+	add, err := helper.Manage.AddStudent(auth, common.HexToAddress(input.Address), big.NewInt(int64(save.Id)), input.LastName)
+	if err != nil {
+		helper.PanicIfError(err)
+	}
+	log.Printf("add successfull", add)
 
 	return helper.ToUserResponse(save)
 }

@@ -3,7 +3,14 @@ package web
 type QuestionCreateInput struct {
 	AuthorId int
 	CourseId int
-	Content  string `json:"content"`
+	Content  string           `json:"content"`
+	Options  []OptionResponse `json:"options"`
+}
+
+type ListQuestionCreateInput struct {
+	AuthorId  int
+	CourseId  int
+	Questions []QuestionResponse `json:"questions"`
 }
 
 type QuestionResponse struct {

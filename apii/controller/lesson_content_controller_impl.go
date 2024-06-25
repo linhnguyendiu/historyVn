@@ -78,16 +78,14 @@ func (c *LessonContentControllerImpl) GetByLessonId(ctx *gin.Context) {
 // }
 
 func (c *LessonContentControllerImpl) Create(ctx *gin.Context) {
-	input := web.LessonContentCreateInput{}
+	input := web.ListLessonContentCreateInput{}
 	err := ctx.ShouldBindJSON(&input)
 	helper.PanicIfError(err)
 
 	authorId := ctx.MustGet("current_author").(web.AuthorResponse).Id
-	courseId, _ := strconv.Atoi(ctx.Param("courseId"))
 	ltId, _ := strconv.Atoi(ctx.Param("ltId"))
 
 	input.AuthorId = authorId
-	input.CourseId = courseId
 	input.LessonId = ltId
 
 	lessonContentResponse := c.LessonContentService.Create(input)

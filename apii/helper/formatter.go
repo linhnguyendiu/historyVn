@@ -32,7 +32,7 @@ func ToAuthorResponse(author domain.Author) web.AuthorResponse {
 	return authorResponse
 }
 
-func ToCourseResponse(course domain.Course, countUserEnrolled int, countLessons int) web.CourseResponse {
+func ToCourseResponse(course domain.Course) web.CourseResponse {
 	courseResponse := web.CourseResponse{}
 	courseResponse.Id = course.Id
 	courseResponse.AuthorId = course.AuthorId
@@ -43,10 +43,32 @@ func ToCourseResponse(course domain.Course, countUserEnrolled int, countLessons 
 	courseResponse.Reward = course.Reward
 	courseResponse.Category = course.Category
 	courseResponse.DurationQuiz = course.DurationQuiz
-	courseResponse.UsersEnrolled = countUserEnrolled
-	courseResponse.LessonsCount = countLessons
+	courseResponse.UsersEnrolled = course.UsersEnrolled
+	courseResponse.LessonsCount = course.LessonsCount
+	courseResponse.DurationToLearn = course.DurationToLearn
+	courseResponse.QuizzesCount = course.QuizzesCount
+	courseResponse.HashCourse = course.HashCourse
 	return courseResponse
 }
+
+// func ToUserCourseResponse(course domain.Course) web.UserCourseResponse {
+// 	courseResponse := web.UserCourseResponse{}
+// 	courseResponse.Id = course.Id
+// 	courseResponse.AuthorId = course.AuthorId
+// 	courseResponse.Title = course.Title
+// 	courseResponse.Type = course.Type
+// 	courseResponse.Description = course.Description
+// 	courseResponse.Price = course.Price
+// 	courseResponse.Reward = course.Reward
+// 	courseResponse.Category = course.Category
+// 	courseResponse.DurationQuiz = course.DurationQuiz
+// 	courseResponse.UsersEnrolled = course.UsersEnrolled
+// 	courseResponse.LessonsCount = course.LessonsCount
+// 	courseResponse.DurationToLearn = course.DurationToLearn
+// 	courseResponse.QuizzesCount = course.QuizzesCount
+// 	courseResponse.HashCourse = course.HashCourse
+// 	return courseResponse
+// }
 
 func ToPostResponse(post domain.Post) web.PostResponse {
 	postResponse := web.PostResponse{}
@@ -217,6 +239,7 @@ func ToExamResultResponse(title domain.ExamResult) web.ExamResultResponse {
 		TotalQuestions:     title.TotalQuestions,
 		RewardAddress:      title.RewardAddress,
 		CertificateAddress: title.CertificateAddress,
+		HashAnswer:         title.HashAnswer,
 	}
 }
 
@@ -268,4 +291,25 @@ func ToImgCoursesResponse(imgs []domain.ImageCourse) []web.ImgCourseResponse {
 	}
 
 	return imgsResponse
+}
+
+func ToEnrollCourseResponse(title domain.ExamResult) web.EnrollCourseResponse {
+	return web.EnrollCourseResponse{
+		CourseId:   title.CourseId,
+		UserId:     title.UserId,
+		EnrolledAt: title.EnrolledAt,
+		Status:     title.Status,
+	}
+}
+
+func ToCertificateResponse(cert domain.Certificate) web.CertificateResponse {
+	return web.CertificateResponse{
+		Id:         cert.Id,
+		UserName:   cert.UserName,
+		CourseName: cert.CourseName,
+		Date:       cert.Date,
+		CertType:   cert.CertType,
+		ImageUri:   cert.ImageUri,
+		CertUri:    cert.CertUri,
+	}
 }

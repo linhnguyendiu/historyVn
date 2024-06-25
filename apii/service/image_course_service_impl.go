@@ -27,6 +27,7 @@ func (s *ImageCourseServiceImpl) Create(input web.ImgCourseRequest) web.ImgCours
 	img.CourseId = input.CourseId
 	img.ImageType = input.ImageType
 	img.Description = input.Description
+	img.ImageAlt = input.ImageAlt
 
 	_, err := s.CourseRepository.FindById(img.CourseId)
 	if err != nil {

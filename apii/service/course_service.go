@@ -17,7 +17,11 @@ type CourseService interface {
 	FindByCategory(categoryName string) []web.CourseResponse
 	FindAll() []web.CourseResponse
 	UserEnrolled(userId int, courseId int) domain.UserCourse
-	FindAllCourseIdByUserId(userId int) []string
+	FindAllCourseIdByUserId(userId int) []web.CourseResponse
 	GetScore(ctx context.Context, request web.ExamRequest) web.ExamResultResponse
 	FindTop3Coures() []web.CourseResponse
+	IsCourseCompletedByUser(userId int, courseId int) (bool, error)
+	EnrollCourse(input web.EnrollCourseInput) web.EnrollCourseResponse
+	CheckUserEnrollment(userId, courseId int) (bool, error)
+	FindResultById(userId int, courseId int) web.ExamResultResponse
 }

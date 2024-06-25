@@ -44,6 +44,7 @@ type EduManageCourse struct {
 // EduManageGrade is an auto generated low-level Go binding around an user-defined struct.
 type EduManageGrade struct {
 	Mark            *big.Int
+	HashResultExam  string
 	IsSet           bool
 	IsReceiveReward bool
 	IsMintCert      bool
@@ -68,7 +69,7 @@ type EduManageStudent struct {
 
 // EduManageMetaData contains all meta data concerning the EduManage contract.
 var EduManageMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tokenAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_NFTAddress\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"CertNFT\",\"outputs\":[{\"internalType\":\"contractCertificateNFT\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"LINK\",\"outputs\":[{\"internalType\":\"contractLINKToken\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"course_id\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"price\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"reward\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"courseType\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"hashCourse\",\"type\":\"string\"}],\"name\":\"addCourse\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"post_id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"owner_add\",\"type\":\"address\"}],\"name\":\"addPost\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"stu_add\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"stu_id\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"}],\"name\":\"addStudent\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"allowanceBuyCourse\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"stu_id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"course_id\",\"type\":\"uint256\"}],\"name\":\"buyCourse\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"stu_id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"course_id\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"image_uri\",\"type\":\"string\"}],\"name\":\"checkAndTransferRewardCourse\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"post_id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"point\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"reject_count\",\"type\":\"uint256\"}],\"name\":\"checkAndTransferRewardPost\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"stu_id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"course_id\",\"type\":\"uint256\"}],\"name\":\"checkEnrolledCourse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"decimals\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_id\",\"type\":\"uint256\"}],\"name\":\"getCourse\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"users\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"price\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"reward\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"courseType\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"hashCourse\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"createTime\",\"type\":\"uint256\"}],\"internalType\":\"structEduManage.Course\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCourseCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_stu_id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_course_id\",\"type\":\"uint256\"}],\"name\":\"getGrades\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"mark\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"isSet\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"isReceiveReward\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"isMintCert\",\"type\":\"bool\"}],\"internalType\":\"structEduManage.Grade\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_id\",\"type\":\"uint256\"}],\"name\":\"getPosts\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"point\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"rejectCount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"rewardCount\",\"type\":\"uint256\"}],\"internalType\":\"structEduManage.Post\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_id\",\"type\":\"uint256\"}],\"name\":\"getStudent\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"stuAdd\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"stu_name\",\"type\":\"string\"},{\"internalType\":\"uint256[]\",\"name\":\"courses_id\",\"type\":\"uint256[]\"}],\"internalType\":\"structEduManage.Student\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"grades\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"mark\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"isSet\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"isReceiveReward\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"isMintCert\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"postPointToReward\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"postTokenReward\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_numberOfTokens\",\"type\":\"uint256\"}],\"name\":\"rewardToken\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"stu_id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"course_id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_mark\",\"type\":\"uint256\"}],\"name\":\"submitGrade\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tokenAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_NFTAddress\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"course\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"date\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"cerType\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"imageUri\",\"type\":\"string\"}],\"name\":\"CertificateMinted\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"CertNFT\",\"outputs\":[{\"internalType\":\"contractCertificateNFT\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"LINK\",\"outputs\":[{\"internalType\":\"contractLINKToken\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"course_id\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"price\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"reward\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"courseType\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"hashCourse\",\"type\":\"string\"}],\"name\":\"addCourse\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"post_id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"owner_add\",\"type\":\"address\"}],\"name\":\"addPost\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"stu_add\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"stu_id\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"}],\"name\":\"addStudent\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"allowanceBuyCourse\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"stu_id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"course_id\",\"type\":\"uint256\"}],\"name\":\"buyCourse\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"stu_id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"course_id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"token_id\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"image_uri\",\"type\":\"string\"}],\"name\":\"checkAndTransferRewardCourse\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"post_id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"point\",\"type\":\"uint256\"}],\"name\":\"checkAndTransferRewardPost\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"stu_id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"course_id\",\"type\":\"uint256\"}],\"name\":\"checkEnrolledCourse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"decimals\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_id\",\"type\":\"uint256\"}],\"name\":\"getCourse\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"users\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"price\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"reward\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"courseType\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"hashCourse\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"createTime\",\"type\":\"uint256\"}],\"internalType\":\"structEduManage.Course\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCourseCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_stu_id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_course_id\",\"type\":\"uint256\"}],\"name\":\"getGrades\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"mark\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"hashResultExam\",\"type\":\"string\"},{\"internalType\":\"bool\",\"name\":\"isSet\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"isReceiveReward\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"isMintCert\",\"type\":\"bool\"}],\"internalType\":\"structEduManage.Grade\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_id\",\"type\":\"uint256\"}],\"name\":\"getPosts\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"point\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"rejectCount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"rewardCount\",\"type\":\"uint256\"}],\"internalType\":\"structEduManage.Post\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_id\",\"type\":\"uint256\"}],\"name\":\"getStudent\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"stuAdd\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"stu_name\",\"type\":\"string\"},{\"internalType\":\"uint256[]\",\"name\":\"courses_id\",\"type\":\"uint256[]\"}],\"internalType\":\"structEduManage.Student\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"grades\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"mark\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"hashResultExam\",\"type\":\"string\"},{\"internalType\":\"bool\",\"name\":\"isSet\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"isReceiveReward\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"isMintCert\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"postPointToReward\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"postTokenReward\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_numberOfTokens\",\"type\":\"uint256\"}],\"name\":\"rewardToken\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"stu_id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"course_id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_mark\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"hash_result_exam\",\"type\":\"string\"}],\"name\":\"submitGrade\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 }
 
 // EduManageABI is the input ABI used to generate the binding from.
@@ -436,7 +437,7 @@ func (_EduManage *EduManageCallerSession) GetCourseCount() (*big.Int, error) {
 
 // GetGrades is a free data retrieval call binding the contract method 0x3956c5d5.
 //
-// Solidity: function getGrades(uint256 _stu_id, uint256 _course_id) view returns((uint256,bool,bool,bool))
+// Solidity: function getGrades(uint256 _stu_id, uint256 _course_id) view returns((uint256,string,bool,bool,bool))
 func (_EduManage *EduManageCaller) GetGrades(opts *bind.CallOpts, _stu_id *big.Int, _course_id *big.Int) (EduManageGrade, error) {
 	var out []interface{}
 	err := _EduManage.contract.Call(opts, &out, "getGrades", _stu_id, _course_id)
@@ -453,14 +454,14 @@ func (_EduManage *EduManageCaller) GetGrades(opts *bind.CallOpts, _stu_id *big.I
 
 // GetGrades is a free data retrieval call binding the contract method 0x3956c5d5.
 //
-// Solidity: function getGrades(uint256 _stu_id, uint256 _course_id) view returns((uint256,bool,bool,bool))
+// Solidity: function getGrades(uint256 _stu_id, uint256 _course_id) view returns((uint256,string,bool,bool,bool))
 func (_EduManage *EduManageSession) GetGrades(_stu_id *big.Int, _course_id *big.Int) (EduManageGrade, error) {
 	return _EduManage.Contract.GetGrades(&_EduManage.CallOpts, _stu_id, _course_id)
 }
 
 // GetGrades is a free data retrieval call binding the contract method 0x3956c5d5.
 //
-// Solidity: function getGrades(uint256 _stu_id, uint256 _course_id) view returns((uint256,bool,bool,bool))
+// Solidity: function getGrades(uint256 _stu_id, uint256 _course_id) view returns((uint256,string,bool,bool,bool))
 func (_EduManage *EduManageCallerSession) GetGrades(_stu_id *big.Int, _course_id *big.Int) (EduManageGrade, error) {
 	return _EduManage.Contract.GetGrades(&_EduManage.CallOpts, _stu_id, _course_id)
 }
@@ -529,9 +530,10 @@ func (_EduManage *EduManageCallerSession) GetStudent(_id *big.Int) (EduManageStu
 
 // Grades is a free data retrieval call binding the contract method 0x5bd6fa74.
 //
-// Solidity: function grades(uint256 , uint256 ) view returns(uint256 mark, bool isSet, bool isReceiveReward, bool isMintCert)
+// Solidity: function grades(uint256 , uint256 ) view returns(uint256 mark, string hashResultExam, bool isSet, bool isReceiveReward, bool isMintCert)
 func (_EduManage *EduManageCaller) Grades(opts *bind.CallOpts, arg0 *big.Int, arg1 *big.Int) (struct {
 	Mark            *big.Int
+	HashResultExam  string
 	IsSet           bool
 	IsReceiveReward bool
 	IsMintCert      bool
@@ -541,6 +543,7 @@ func (_EduManage *EduManageCaller) Grades(opts *bind.CallOpts, arg0 *big.Int, ar
 
 	outstruct := new(struct {
 		Mark            *big.Int
+		HashResultExam  string
 		IsSet           bool
 		IsReceiveReward bool
 		IsMintCert      bool
@@ -550,9 +553,10 @@ func (_EduManage *EduManageCaller) Grades(opts *bind.CallOpts, arg0 *big.Int, ar
 	}
 
 	outstruct.Mark = *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-	outstruct.IsSet = *abi.ConvertType(out[1], new(bool)).(*bool)
-	outstruct.IsReceiveReward = *abi.ConvertType(out[2], new(bool)).(*bool)
-	outstruct.IsMintCert = *abi.ConvertType(out[3], new(bool)).(*bool)
+	outstruct.HashResultExam = *abi.ConvertType(out[1], new(string)).(*string)
+	outstruct.IsSet = *abi.ConvertType(out[2], new(bool)).(*bool)
+	outstruct.IsReceiveReward = *abi.ConvertType(out[3], new(bool)).(*bool)
+	outstruct.IsMintCert = *abi.ConvertType(out[4], new(bool)).(*bool)
 
 	return *outstruct, err
 
@@ -560,9 +564,10 @@ func (_EduManage *EduManageCaller) Grades(opts *bind.CallOpts, arg0 *big.Int, ar
 
 // Grades is a free data retrieval call binding the contract method 0x5bd6fa74.
 //
-// Solidity: function grades(uint256 , uint256 ) view returns(uint256 mark, bool isSet, bool isReceiveReward, bool isMintCert)
+// Solidity: function grades(uint256 , uint256 ) view returns(uint256 mark, string hashResultExam, bool isSet, bool isReceiveReward, bool isMintCert)
 func (_EduManage *EduManageSession) Grades(arg0 *big.Int, arg1 *big.Int) (struct {
 	Mark            *big.Int
+	HashResultExam  string
 	IsSet           bool
 	IsReceiveReward bool
 	IsMintCert      bool
@@ -572,9 +577,10 @@ func (_EduManage *EduManageSession) Grades(arg0 *big.Int, arg1 *big.Int) (struct
 
 // Grades is a free data retrieval call binding the contract method 0x5bd6fa74.
 //
-// Solidity: function grades(uint256 , uint256 ) view returns(uint256 mark, bool isSet, bool isReceiveReward, bool isMintCert)
+// Solidity: function grades(uint256 , uint256 ) view returns(uint256 mark, string hashResultExam, bool isSet, bool isReceiveReward, bool isMintCert)
 func (_EduManage *EduManageCallerSession) Grades(arg0 *big.Int, arg1 *big.Int) (struct {
 	Mark            *big.Int
+	HashResultExam  string
 	IsSet           bool
 	IsReceiveReward bool
 	IsMintCert      bool
@@ -759,46 +765,46 @@ func (_EduManage *EduManageTransactorSession) BuyCourse(stu_id *big.Int, course_
 	return _EduManage.Contract.BuyCourse(&_EduManage.TransactOpts, stu_id, course_id)
 }
 
-// CheckAndTransferRewardCourse is a paid mutator transaction binding the contract method 0x899ec3a6.
+// CheckAndTransferRewardCourse is a paid mutator transaction binding the contract method 0x48339a89.
 //
-// Solidity: function checkAndTransferRewardCourse(uint256 stu_id, uint256 course_id, string image_uri) payable returns()
-func (_EduManage *EduManageTransactor) CheckAndTransferRewardCourse(opts *bind.TransactOpts, stu_id *big.Int, course_id *big.Int, image_uri string) (*types.Transaction, error) {
-	return _EduManage.contract.Transact(opts, "checkAndTransferRewardCourse", stu_id, course_id, image_uri)
+// Solidity: function checkAndTransferRewardCourse(uint256 stu_id, uint256 course_id, uint256 token_id, string image_uri) payable returns()
+func (_EduManage *EduManageTransactor) CheckAndTransferRewardCourse(opts *bind.TransactOpts, stu_id *big.Int, course_id *big.Int, token_id *big.Int, image_uri string) (*types.Transaction, error) {
+	return _EduManage.contract.Transact(opts, "checkAndTransferRewardCourse", stu_id, course_id, token_id, image_uri)
 }
 
-// CheckAndTransferRewardCourse is a paid mutator transaction binding the contract method 0x899ec3a6.
+// CheckAndTransferRewardCourse is a paid mutator transaction binding the contract method 0x48339a89.
 //
-// Solidity: function checkAndTransferRewardCourse(uint256 stu_id, uint256 course_id, string image_uri) payable returns()
-func (_EduManage *EduManageSession) CheckAndTransferRewardCourse(stu_id *big.Int, course_id *big.Int, image_uri string) (*types.Transaction, error) {
-	return _EduManage.Contract.CheckAndTransferRewardCourse(&_EduManage.TransactOpts, stu_id, course_id, image_uri)
+// Solidity: function checkAndTransferRewardCourse(uint256 stu_id, uint256 course_id, uint256 token_id, string image_uri) payable returns()
+func (_EduManage *EduManageSession) CheckAndTransferRewardCourse(stu_id *big.Int, course_id *big.Int, token_id *big.Int, image_uri string) (*types.Transaction, error) {
+	return _EduManage.Contract.CheckAndTransferRewardCourse(&_EduManage.TransactOpts, stu_id, course_id, token_id, image_uri)
 }
 
-// CheckAndTransferRewardCourse is a paid mutator transaction binding the contract method 0x899ec3a6.
+// CheckAndTransferRewardCourse is a paid mutator transaction binding the contract method 0x48339a89.
 //
-// Solidity: function checkAndTransferRewardCourse(uint256 stu_id, uint256 course_id, string image_uri) payable returns()
-func (_EduManage *EduManageTransactorSession) CheckAndTransferRewardCourse(stu_id *big.Int, course_id *big.Int, image_uri string) (*types.Transaction, error) {
-	return _EduManage.Contract.CheckAndTransferRewardCourse(&_EduManage.TransactOpts, stu_id, course_id, image_uri)
+// Solidity: function checkAndTransferRewardCourse(uint256 stu_id, uint256 course_id, uint256 token_id, string image_uri) payable returns()
+func (_EduManage *EduManageTransactorSession) CheckAndTransferRewardCourse(stu_id *big.Int, course_id *big.Int, token_id *big.Int, image_uri string) (*types.Transaction, error) {
+	return _EduManage.Contract.CheckAndTransferRewardCourse(&_EduManage.TransactOpts, stu_id, course_id, token_id, image_uri)
 }
 
-// CheckAndTransferRewardPost is a paid mutator transaction binding the contract method 0x55075a64.
+// CheckAndTransferRewardPost is a paid mutator transaction binding the contract method 0xeda0a4dc.
 //
-// Solidity: function checkAndTransferRewardPost(uint256 post_id, uint256 point, uint256 reject_count) payable returns()
-func (_EduManage *EduManageTransactor) CheckAndTransferRewardPost(opts *bind.TransactOpts, post_id *big.Int, point *big.Int, reject_count *big.Int) (*types.Transaction, error) {
-	return _EduManage.contract.Transact(opts, "checkAndTransferRewardPost", post_id, point, reject_count)
+// Solidity: function checkAndTransferRewardPost(uint256 post_id, uint256 point) payable returns()
+func (_EduManage *EduManageTransactor) CheckAndTransferRewardPost(opts *bind.TransactOpts, post_id *big.Int, point *big.Int) (*types.Transaction, error) {
+	return _EduManage.contract.Transact(opts, "checkAndTransferRewardPost", post_id, point)
 }
 
-// CheckAndTransferRewardPost is a paid mutator transaction binding the contract method 0x55075a64.
+// CheckAndTransferRewardPost is a paid mutator transaction binding the contract method 0xeda0a4dc.
 //
-// Solidity: function checkAndTransferRewardPost(uint256 post_id, uint256 point, uint256 reject_count) payable returns()
-func (_EduManage *EduManageSession) CheckAndTransferRewardPost(post_id *big.Int, point *big.Int, reject_count *big.Int) (*types.Transaction, error) {
-	return _EduManage.Contract.CheckAndTransferRewardPost(&_EduManage.TransactOpts, post_id, point, reject_count)
+// Solidity: function checkAndTransferRewardPost(uint256 post_id, uint256 point) payable returns()
+func (_EduManage *EduManageSession) CheckAndTransferRewardPost(post_id *big.Int, point *big.Int) (*types.Transaction, error) {
+	return _EduManage.Contract.CheckAndTransferRewardPost(&_EduManage.TransactOpts, post_id, point)
 }
 
-// CheckAndTransferRewardPost is a paid mutator transaction binding the contract method 0x55075a64.
+// CheckAndTransferRewardPost is a paid mutator transaction binding the contract method 0xeda0a4dc.
 //
-// Solidity: function checkAndTransferRewardPost(uint256 post_id, uint256 point, uint256 reject_count) payable returns()
-func (_EduManage *EduManageTransactorSession) CheckAndTransferRewardPost(post_id *big.Int, point *big.Int, reject_count *big.Int) (*types.Transaction, error) {
-	return _EduManage.Contract.CheckAndTransferRewardPost(&_EduManage.TransactOpts, post_id, point, reject_count)
+// Solidity: function checkAndTransferRewardPost(uint256 post_id, uint256 point) payable returns()
+func (_EduManage *EduManageTransactorSession) CheckAndTransferRewardPost(post_id *big.Int, point *big.Int) (*types.Transaction, error) {
+	return _EduManage.Contract.CheckAndTransferRewardPost(&_EduManage.TransactOpts, post_id, point)
 }
 
 // RewardToken is a paid mutator transaction binding the contract method 0xfb41138c.
@@ -822,23 +828,163 @@ func (_EduManage *EduManageTransactorSession) RewardToken(recipient common.Addre
 	return _EduManage.Contract.RewardToken(&_EduManage.TransactOpts, recipient, _numberOfTokens)
 }
 
-// SubmitGrade is a paid mutator transaction binding the contract method 0x5c21cd52.
+// SubmitGrade is a paid mutator transaction binding the contract method 0x40a7497d.
 //
-// Solidity: function submitGrade(uint256 stu_id, uint256 course_id, uint256 _mark) returns(bool)
-func (_EduManage *EduManageTransactor) SubmitGrade(opts *bind.TransactOpts, stu_id *big.Int, course_id *big.Int, _mark *big.Int) (*types.Transaction, error) {
-	return _EduManage.contract.Transact(opts, "submitGrade", stu_id, course_id, _mark)
+// Solidity: function submitGrade(uint256 stu_id, uint256 course_id, uint256 _mark, string hash_result_exam) returns(bool)
+func (_EduManage *EduManageTransactor) SubmitGrade(opts *bind.TransactOpts, stu_id *big.Int, course_id *big.Int, _mark *big.Int, hash_result_exam string) (*types.Transaction, error) {
+	return _EduManage.contract.Transact(opts, "submitGrade", stu_id, course_id, _mark, hash_result_exam)
 }
 
-// SubmitGrade is a paid mutator transaction binding the contract method 0x5c21cd52.
+// SubmitGrade is a paid mutator transaction binding the contract method 0x40a7497d.
 //
-// Solidity: function submitGrade(uint256 stu_id, uint256 course_id, uint256 _mark) returns(bool)
-func (_EduManage *EduManageSession) SubmitGrade(stu_id *big.Int, course_id *big.Int, _mark *big.Int) (*types.Transaction, error) {
-	return _EduManage.Contract.SubmitGrade(&_EduManage.TransactOpts, stu_id, course_id, _mark)
+// Solidity: function submitGrade(uint256 stu_id, uint256 course_id, uint256 _mark, string hash_result_exam) returns(bool)
+func (_EduManage *EduManageSession) SubmitGrade(stu_id *big.Int, course_id *big.Int, _mark *big.Int, hash_result_exam string) (*types.Transaction, error) {
+	return _EduManage.Contract.SubmitGrade(&_EduManage.TransactOpts, stu_id, course_id, _mark, hash_result_exam)
 }
 
-// SubmitGrade is a paid mutator transaction binding the contract method 0x5c21cd52.
+// SubmitGrade is a paid mutator transaction binding the contract method 0x40a7497d.
 //
-// Solidity: function submitGrade(uint256 stu_id, uint256 course_id, uint256 _mark) returns(bool)
-func (_EduManage *EduManageTransactorSession) SubmitGrade(stu_id *big.Int, course_id *big.Int, _mark *big.Int) (*types.Transaction, error) {
-	return _EduManage.Contract.SubmitGrade(&_EduManage.TransactOpts, stu_id, course_id, _mark)
+// Solidity: function submitGrade(uint256 stu_id, uint256 course_id, uint256 _mark, string hash_result_exam) returns(bool)
+func (_EduManage *EduManageTransactorSession) SubmitGrade(stu_id *big.Int, course_id *big.Int, _mark *big.Int, hash_result_exam string) (*types.Transaction, error) {
+	return _EduManage.Contract.SubmitGrade(&_EduManage.TransactOpts, stu_id, course_id, _mark, hash_result_exam)
+}
+
+// EduManageCertificateMintedIterator is returned from FilterCertificateMinted and is used to iterate over the raw logs and unpacked data for CertificateMinted events raised by the EduManage contract.
+type EduManageCertificateMintedIterator struct {
+	Event *EduManageCertificateMinted // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *EduManageCertificateMintedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(EduManageCertificateMinted)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(EduManageCertificateMinted)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *EduManageCertificateMintedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *EduManageCertificateMintedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// EduManageCertificateMinted represents a CertificateMinted event raised by the EduManage contract.
+type EduManageCertificateMinted struct {
+	Recipient common.Address
+	TokenId   *big.Int
+	Name      string
+	Course    string
+	Date      *big.Int
+	CerType   string
+	ImageUri  string
+	Raw       types.Log // Blockchain specific contextual infos
+}
+
+// FilterCertificateMinted is a free log retrieval operation binding the contract event 0xa4e45d12c1f3fdec083d18975dfe779a14e4ccdc4d29ce3a24761bebac3bf4f8.
+//
+// Solidity: event CertificateMinted(address recipient, uint256 tokenId, string name, string course, uint256 date, string cerType, string imageUri)
+func (_EduManage *EduManageFilterer) FilterCertificateMinted(opts *bind.FilterOpts) (*EduManageCertificateMintedIterator, error) {
+
+	logs, sub, err := _EduManage.contract.FilterLogs(opts, "CertificateMinted")
+	if err != nil {
+		return nil, err
+	}
+	return &EduManageCertificateMintedIterator{contract: _EduManage.contract, event: "CertificateMinted", logs: logs, sub: sub}, nil
+}
+
+// WatchCertificateMinted is a free log subscription operation binding the contract event 0xa4e45d12c1f3fdec083d18975dfe779a14e4ccdc4d29ce3a24761bebac3bf4f8.
+//
+// Solidity: event CertificateMinted(address recipient, uint256 tokenId, string name, string course, uint256 date, string cerType, string imageUri)
+func (_EduManage *EduManageFilterer) WatchCertificateMinted(opts *bind.WatchOpts, sink chan<- *EduManageCertificateMinted) (event.Subscription, error) {
+
+	logs, sub, err := _EduManage.contract.WatchLogs(opts, "CertificateMinted")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(EduManageCertificateMinted)
+				if err := _EduManage.contract.UnpackLog(event, "CertificateMinted", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseCertificateMinted is a log parse operation binding the contract event 0xa4e45d12c1f3fdec083d18975dfe779a14e4ccdc4d29ce3a24761bebac3bf4f8.
+//
+// Solidity: event CertificateMinted(address recipient, uint256 tokenId, string name, string course, uint256 date, string cerType, string imageUri)
+func (_EduManage *EduManageFilterer) ParseCertificateMinted(log types.Log) (*EduManageCertificateMinted, error) {
+	event := new(EduManageCertificateMinted)
+	if err := _EduManage.contract.UnpackLog(event, "CertificateMinted", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
 }

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .certificate { width: 100%; text-align: center; padding: 50px; }
+        .title { font-size: 30px; font-weight: bold; }
+        .artist { font-size: 20px; margin-top: 10px; }
+        .image { margin: 20px 0; }
+        .details { font-size: 15px; }
+        .signature { margin-top: 50px; font-size: 20px; }
+    </style>
+</head>
+<body>
+    <div class="certificate">
+        <div class="title">{{ .CourseName }}</div>
+        <div class="artist">{{ .UserName }}</div>
+        <div class="image">
+            <img src="../assets/images/courses/1-HongBang.jpeg" alt="{{ .CourseName }}" width="300">
+        </div>
+        <div class="details">
+            Year: {{ .Date }}<br>
+            Dimensions: {{ .CertType }}
+        </div>
+    </div>
+</body>
+</html>

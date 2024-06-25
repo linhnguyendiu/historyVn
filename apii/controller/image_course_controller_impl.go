@@ -17,12 +17,14 @@ type ImageCourseControllerImpl struct {
 func (c *ImageCourseControllerImpl) UploadImg(ctx *gin.Context) {
 	imgId, _ := strconv.Atoi(ctx.Param("imgId"))
 
-	fileHeader, _ := ctx.FormFile("imgAlt")
+	fileHeader, err := ctx.FormFile("image")
+	helper.PanicIfError(err)
 
 	pathFile := fmt.Sprintf("assets/images/courses/%d-%s", imgId, fileHeader.Filename)
 	uploadImg := c.ImageCourseService.UploadImg(imgId, pathFile)
 
-	ctx.SaveUploadedFile(fileHeader, pathFile)
+	err = ctx.SaveUploadedFile(fileHeader, pathFile)
+	helper.PanicIfError(err)
 
 	ctx.JSON(200,
 		helper.APIResponse(200, "Banner is successfully uploaded",

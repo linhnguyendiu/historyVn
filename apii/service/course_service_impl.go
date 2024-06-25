@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -8,20 +9,47 @@ import (
 	"go-pzn-restful-api/model/domain"
 	"go-pzn-restful-api/model/web"
 	"go-pzn-restful-api/repository"
+	"log"
+	"math/big"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/go-redis/redis"
+	"github.com/jung-kurt/gofpdf"
+	"github.com/jung-kurt/gofpdf/contrib/httpimg"
 )
 
 type CourseServiceImpl struct {
 	repository.CourseRepository
-	TransactionService
 	repository.OptionRepository
 	repository.ExamResultRepository
+	repository.ImageCourseRepository
+	repository.ChapterRepository
+	repository.LessonRepository
+	repository.UserRepository
+	repository.CertificateRepository
 }
 
-func (s *CourseServiceImpl) FindAllCourseIdByUserId(userId int) []string {
-	return s.CourseRepository.FindAllCourseIdByUserId(userId)
+func (s *CourseServiceImpl) FindAllCourseIdByUserId(userId int) []web.CourseResponse {
+	courses, err := s.CourseRepository.FindByUserId(userId)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	coursesResponse := []web.CourseResponse{}
+	for _, course := range courses {
+		// countUsersEnrolled := s.CourseRepository.CountUsersEnrolled(course.Id)
+
+		courseResponse := helper.ToCourseResponse(course)
+		coursesResponse = append(coursesResponse, courseResponse)
+	}
+
+	return coursesResponse
+}
+
+func (s *CourseServiceImpl) CheckUserEnrollment(userId, courseId int) (bool, error) {
+	return s.ExamResultRepository.HasUserEnrolledInCourse(userId, courseId)
 }
 
 func (s *CourseServiceImpl) FindByCategory(categoryName string) []web.CourseResponse {
@@ -33,11 +61,8 @@ func (s *CourseServiceImpl) FindByCategory(categoryName string) []web.CourseResp
 	coursesResponse := []web.CourseResponse{}
 	for _, course := range courses {
 		// countUsersEnrolled := s.CourseRepository.CountUsersEnrolled(course.Id)
-		countTotalLessonsInCourse, err := s.CourseRepository.CountTotalLessonsInCourse(course.Id)
-		if err != nil {
-			panic(helper.NewNotFoundError(err.Error()))
-		}
-		courseResponse := helper.ToCourseResponse(course, 0, countTotalLessonsInCourse)
+
+		courseResponse := helper.ToCourseResponse(course)
 		coursesResponse = append(coursesResponse, courseResponse)
 	}
 
@@ -52,11 +77,9 @@ func (s *CourseServiceImpl) FindByUserId(userId int) []web.CourseResponse {
 
 	coursesResponse := []web.CourseResponse{}
 	for _, course := range courses {
-		countTotalLessonsInCourse, err := s.CourseRepository.CountTotalLessonsInCourse(course.Id)
-		if err != nil {
-			panic(helper.NewNotFoundError(err.Error()))
-		}
-		courseResponse := helper.ToCourseResponse(course, 0, countTotalLessonsInCourse)
+		// countUsersEnrolled := s.CourseRepository.CountUsersEnrolled(course.Id)
+
+		courseResponse := helper.ToCourseResponse(course)
 		coursesResponse = append(coursesResponse, courseResponse)
 	}
 
@@ -104,14 +127,11 @@ func (s *CourseServiceImpl) FindAll() []web.CourseResponse {
 
 	coursesResponse := []web.CourseResponse{}
 	for _, course := range courses {
-		countTotalLessonsInCourse, err := s.CourseRepository.CountTotalLessonsInCourse(course.Id)
-		if err != nil {
-			panic(helper.NewNotFoundError(err.Error()))
-		}
-		courseResponse := helper.ToCourseResponse(course, 0, countTotalLessonsInCourse)
+		// countUsersEnrolled := s.CourseRepository.CountUsersEnrolled(course.Id)
+
+		courseResponse := helper.ToCourseResponse(course)
 		coursesResponse = append(coursesResponse, courseResponse)
 	}
-
 	return coursesResponse
 }
 
@@ -124,14 +144,10 @@ func (s *CourseServiceImpl) FindTop3Coures() []web.CourseResponse {
 	coursesResponse := []web.CourseResponse{}
 	for _, course := range courses {
 		// countUsersEnrolled := s.CourseRepository.CountUsersEnrolled(course.Id)
-		countTotalLessonsInCourse, err := s.CourseRepository.CountTotalLessonsInCourse(course.Id)
-		if err != nil {
-			panic(helper.NewNotFoundError(err.Error()))
-		}
-		courseResponse := helper.ToCourseResponse(course, 0, countTotalLessonsInCourse)
+
+		courseResponse := helper.ToCourseResponse(course)
 		coursesResponse = append(coursesResponse, courseResponse)
 	}
-
 	return coursesResponse
 }
 
@@ -143,14 +159,11 @@ func (s *CourseServiceImpl) FindByAuthorId(authorId int) []web.CourseResponse {
 
 	coursesResponse := []web.CourseResponse{}
 	for _, course := range courses {
-		countTotalLessonsInCourse, err := s.CourseRepository.CountTotalLessonsInCourse(course.Id)
-		if err != nil {
-			panic(helper.NewNotFoundError(err.Error()))
-		}
-		courseResponse := helper.ToCourseResponse(course, 0, countTotalLessonsInCourse)
+		// countUsersEnrolled := s.CourseRepository.CountUsersEnrolled(course.Id)
+
+		courseResponse := helper.ToCourseResponse(course)
 		coursesResponse = append(coursesResponse, courseResponse)
 	}
-
 	return coursesResponse
 }
 
@@ -163,16 +176,22 @@ func (s *CourseServiceImpl) FindByType(typeCourse string) []web.CourseResponse {
 	coursesResponse := []web.CourseResponse{}
 	for _, course := range findByType {
 		// countUsersEnrolled := s.CourseRepository.CountUsersEnrolled(course.Id)
-		countTotalLessonsInCourse, err := s.CourseRepository.CountTotalLessonsInCourse(course.Id)
-		if err != nil {
-			panic(helper.NewNotFoundError(err.Error()))
-		}
-		courseResponse := helper.ToCourseResponse(course, 0, countTotalLessonsInCourse)
+
+		courseResponse := helper.ToCourseResponse(course)
 		coursesResponse = append(coursesResponse, courseResponse)
 	}
 
 	return coursesResponse
 
+}
+
+func (s *CourseServiceImpl) FindResultById(userId int, courseId int) web.ExamResultResponse {
+	findById, err := s.ExamResultRepository.FindById(userId, courseId)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	return helper.ToExamResultResponse(findById)
 }
 
 func (s *CourseServiceImpl) FindByTypeAndCategory(typeCourse string, cateName string) []web.CourseResponse {
@@ -183,14 +202,11 @@ func (s *CourseServiceImpl) FindByTypeAndCategory(typeCourse string, cateName st
 
 	coursesResponse := []web.CourseResponse{}
 	for _, course := range FindByTypeAndCategory {
-		countTotalLessonsInCourse, err := s.CourseRepository.CountTotalLessonsInCourse(course.Id)
-		if err != nil {
-			panic(helper.NewNotFoundError(err.Error()))
-		}
-		courseResponse := helper.ToCourseResponse(course, 0, countTotalLessonsInCourse)
+		// countUsersEnrolled := s.CourseRepository.CountUsersEnrolled(course.Id)
+
+		courseResponse := helper.ToCourseResponse(course)
 		coursesResponse = append(coursesResponse, courseResponse)
 	}
-
 	return coursesResponse
 
 }
@@ -201,11 +217,8 @@ func (s *CourseServiceImpl) FindById(courseId int) web.CourseResponse {
 		panic(helper.NewNotFoundError(err.Error()))
 	}
 	//countUsersEnrolled := s.CourseRepository.CountUsersEnrolled(findById.Id)
-	countTotalLessonsInCourse, err := s.CourseRepository.CountTotalLessonsInCourse(findById.Id)
-	if err != nil {
-		panic(helper.NewNotFoundError(err.Error()))
-	}
-	return helper.ToCourseResponse(findById, 1, countTotalLessonsInCourse)
+
+	return helper.ToCourseResponse(findById)
 	//return helper.ToCourseResponse(findById, countUsersEnrolled)
 }
 
@@ -227,7 +240,68 @@ func (s *CourseServiceImpl) Create(request web.CourseCreateInput) web.CourseResp
 
 	save := s.CourseRepository.Save(course)
 
-	return helper.ToCourseResponse(save, 0, 0)
+	imageCourses := []domain.ImageCourse{}
+	for _, imgInput := range request.ImageCourses {
+		imageCourse := domain.ImageCourse{
+			CourseId:    save.Id,
+			ImageType:   imgInput.ImageType,
+			Description: imgInput.Description,
+			ImageAlt:    imgInput.ImageAlt,
+		}
+		savedImage := s.ImageCourseRepository.Save(imageCourse)
+		imageCourses = append(imageCourses, savedImage)
+	}
+	course.ImageCourse = imageCourses
+
+	chapters := []domain.Chapter{}
+	for _, chapterInput := range request.Chapters {
+
+		chapter := domain.Chapter{
+			CourseId: save.Id,
+			Title:    chapterInput.Title,
+			InOrder:  chapterInput.InOrder,
+		}
+		savedChapter := s.ChapterRepository.Save(chapter)
+		chapters = append(chapters, savedChapter)
+		// Tạo các tùy chọn
+		lessons := []domain.Lesson{}
+		for _, lessonInput := range chapterInput.Lessons {
+			lesson := domain.Lesson{
+				ChapterId:    savedChapter.Id,
+				Title:        lessonInput.Title,
+				DurationTime: lessonInput.DurationTime,
+				Description:  lessonInput.Description,
+				Type:         lessonInput.Type,
+				InOrder:      lessonInput.InOrder,
+			}
+			savedLesson := s.LessonRepository.Save(lesson)
+			lessons = append(lessons, savedLesson)
+		}
+		savedChapter.Lesson = lessons
+	}
+	course.Chapter = chapters
+
+	calculateTotalDuration, err := s.CourseRepository.CalculateTotalDuration(save.Id)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	countTotalLessonsInCourse, err := s.CourseRepository.CountTotalLessonsInCourse(save.Id)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+	save.DurationToLearn = calculateTotalDuration
+	save.LessonsCount = countTotalLessonsInCourse
+	s.CourseRepository.Update(save)
+
+	hash, err := helper.GenerateSHA256Hash(save)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	save.HashCourse = hash
+	s.CourseRepository.Update(save)
+	return helper.ToCourseResponse(save)
 }
 
 func (s *CourseServiceImpl) FindByKeyword(query string) ([]web.CourseResponse, error) {
@@ -261,11 +335,8 @@ func (s *CourseServiceImpl) FindByKeyword(query string) ([]web.CourseResponse, e
 
 	coursesResponse := []web.CourseResponse{}
 	for _, course := range resultsMap {
-		countTotalLessonsInCourse, err := s.CourseRepository.CountTotalLessonsInCourse(course.Id)
-		if err != nil {
-			panic(helper.NewNotFoundError(err.Error()))
-		}
-		courseResponse := helper.ToCourseResponse(course, 0, countTotalLessonsInCourse)
+
+		courseResponse := helper.ToCourseResponse(course)
 		coursesResponse = append(coursesResponse, courseResponse)
 	}
 
@@ -276,19 +347,80 @@ func (s *CourseServiceImpl) FindByKeyword(query string) ([]web.CourseResponse, e
 	return coursesResponse, nil
 }
 
-func (s *CourseServiceImpl) GetScore(ctx context.Context, request web.ExamRequest) web.ExamResultResponse {
-	examResult := domain.ExamResult{
-		CourseId:       request.CourseId,
-		UserId:         request.UserId,
-		Score:          0,
-		TotalQuestions: 0,
+func (s *CourseServiceImpl) EnrollCourse(input web.EnrollCourseInput) web.EnrollCourseResponse {
+	examResult := domain.ExamResult{}
+	examResult.CourseId = input.CourseId
+	examResult.UserId = input.UserId
+	examResult.EnrolledAt = input.EnrolledAt
+
+	auth := helper.AuthGenerator(helper.Client)
+	add, err := helper.Manage.BuyCourse(auth, big.NewInt(int64(input.UserId)), big.NewInt(int64(input.CourseId)))
+	if err != nil {
+		helper.PanicIfError(err)
 	}
+	log.Printf("buy course successfull", add)
+	examResult.Status = true
+
+	save := s.ExamResultRepository.Save(examResult)
+
+	findById, err := s.CourseRepository.FindById(examResult.CourseId)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	findById.UsersEnrolled += 1
+	log.Printf("userenroll", findById.UsersEnrolled)
+	saveCourse := s.CourseRepository.Update(findById)
+	log.Printf("course", saveCourse)
+	return helper.ToEnrollCourseResponse(save)
+}
+
+func (s *CourseServiceImpl) GetScore(ctx context.Context, request web.ExamRequest) web.ExamResultResponse {
+	examResult, err := s.ExamResultRepository.FindById(request.UserId, request.CourseId)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	isCompleted, err := s.IsCourseCompletedByUser(request.UserId, request.CourseId)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+	if !isCompleted {
+		panic(helper.NewNotFoundError("User has not completed the course"))
+	}
+
+	findById, err := s.UserRepository.FindById(request.UserId)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	course, err := s.CourseRepository.FindById(request.CourseId)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	image, err := s.ImageCourseRepository.GetRandomImageByCourse(request.CourseId)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	examResult.SubmittedAt = time.Now()
+	log.Printf("time", time.Now())
+
+	examResult.Score = 0
 
 	totalQuestions, err := s.CourseRepository.GetTotalQuestionsByCourseId(examResult.CourseId)
 	if err != nil {
 		panic(helper.NewNotFoundError(err.Error()))
 	}
 	examResult.TotalQuestions = int(totalQuestions)
+
+	hash, err := helper.GenerateSHA256Hash(request)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	examResult.HashAnswer = hash
 
 	for _, answerID := range request.Anwers {
 		option, err := s.OptionRepository.FindById(answerID)
@@ -299,7 +431,10 @@ func (s *CourseServiceImpl) GetScore(ctx context.Context, request web.ExamReques
 			examResult.Score++
 		}
 	}
+	log.Printf("score", examResult.Score)
+
 	examResult.Score = int((float64(examResult.Score) / float64(examResult.TotalQuestions)) * 10)
+	log.Printf("score", examResult.Score)
 	//save := s.ExamResultRepository.Save(examResult)
 
 	// Kiểm tra lượt làm của người dùng
@@ -315,8 +450,54 @@ func (s *CourseServiceImpl) GetScore(ctx context.Context, request web.ExamReques
 	attemptCount++
 
 	if attemptCount == 1 {
-		// Lần làm đầu tiên, lưu vào cơ sở dữ liệu
-		save := s.ExamResultRepository.Save(examResult)
+		//Lần làm đầu tiên, lưu vào cơ sở dữ liệu
+		auth := helper.AuthGenerator(helper.Client)
+		add, err := helper.Manage.SubmitGrade(auth, big.NewInt(int64(examResult.UserId)), big.NewInt(int64(examResult.CourseId)), big.NewInt(int64(examResult.Score)), examResult.HashAnswer)
+		if err != nil {
+			helper.PanicIfError(err)
+		}
+		log.Printf("submit grade successfull", add)
+		if examResult.Score > 7 {
+			cert := domain.Certificate{
+				UserName:   findById.LastName,
+				CourseName: course.Title,
+				Date:       examResult.SubmittedAt,
+				CertType:   course.Type,
+				ImageUri:   image.ImageAlt,
+			}
+			log.Printf("cert", cert)
+			certificatePDF, err := GenerateCertPDF(cert)
+			if err != nil {
+				panic(helper.NewNotFoundError(err.Error()))
+			}
+
+			size := int64(len(certificatePDF))
+
+			driveFileID, err := helper.CreateFile(cert.CourseName+".pdf", size, certificatePDF)
+			if err != nil {
+				panic(helper.NewNotFoundError(err.Error()))
+			}
+
+			cert.CertUri = driveFileID
+			certificateNFT := s.CertificateRepository.Save(cert)
+
+			log.Printf("cert", certificateNFT)
+			reward, err := helper.Manage.CheckAndTransferRewardCourse(auth, big.NewInt(int64(examResult.UserId)), big.NewInt(int64(examResult.CourseId)), big.NewInt(int64(certificateNFT.Id)), certificateNFT.ImageUri)
+			if err != nil {
+				helper.PanicIfError(err)
+			}
+			log.Printf("transac reward successfull", reward)
+			txHash := reward.Hash().Hex()
+			examResult.RewardAddress = txHash
+			examResult.CertificateAddress = strconv.Itoa(certificateNFT.Id)
+			findById.Balance = findById.Balance + course.Reward
+		}
+
+		save, err := s.ExamResultRepository.Update(examResult)
+		if err != nil {
+			panic(helper.NewNotFoundError(err.Error()))
+		}
+
 		if err := helper.RedisCli.Set(ctx, userAttemptsKey, 1, 0).Err(); err != nil {
 			panic(err)
 		}
@@ -334,12 +515,73 @@ func (s *CourseServiceImpl) GetScore(ctx context.Context, request web.ExamReques
 			UserId:         request.UserId,
 			CourseId:       request.CourseId,
 			Attempt:        attemptCount,
+			SubmittedAt:    examResult.SubmittedAt,
 			Score:          examResult.Score,
 			TotalQuestions: examResult.TotalQuestions,
 		}
 	}
 }
 
-func NewCourseService(courseRepository repository.CourseRepository, optionRepository repository.OptionRepository, examResultRepository repository.ExamResultRepository) CourseService {
-	return &CourseServiceImpl{CourseRepository: courseRepository, OptionRepository: optionRepository, ExamResultRepository: examResultRepository}
+func (s *CourseServiceImpl) IsCourseCompletedByUser(userId int, courseId int) (bool, error) {
+	findById, err := s.CourseRepository.FindById(courseId)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	countTotalLessonsInCourse, err := s.CourseRepository.CountTotalLessonsInCourse(findById.Id)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	completedLessons, err := s.CourseRepository.CountCompletedLessonsByUserInCourse(userId, findById.Id)
+	if err != nil {
+		return false, err
+	}
+
+	if int(completedLessons) >= countTotalLessonsInCourse {
+		return true, nil
+	}
+	return false, nil
+}
+
+func GenerateCertPDF(req domain.Certificate) ([]byte, error) {
+	// Tạo file PDF
+	pdf := gofpdf.New("P", "mm", "A6", "")
+	pdf.AddPage()
+
+	// // Thêm logo
+	// pdf.Image("../assets/c", 10, 10, 30, 0, false, "", 0, "")
+
+	// Thêm tiêu đề
+	pdf.SetFont("Arial", "B", 16)
+	pdf.Cell(40, 10, "CERTIFICATE OF AUTHENTICITY")
+
+	// Thêm hình ảnh minh họa
+	httpimg.Register(pdf, req.ImageUri, "")
+	if pdf.Err() {
+		log.Printf("error registering image %s: %s", req.ImageUri, pdf.Error())
+		pdf.ClearError()
+	}
+	pdf.Image(req.ImageUri, 10, 30, 80, 0, false, "", 0, "")
+
+	// Thêm thông tin người học và khóa học
+	pdf.SetXY(100, 30)
+	pdf.SetFont("Arial", "B", 14)
+	pdf.MultiCell(100, 10, req.UserName, "", "L", false)
+	pdf.MultiCell(100, 10, req.CourseName, "", "L", false)
+	// pdf.MultiCell(100, 10, req.Date, "", "L", false)
+
+	// // Thêm chữ ký
+	// pdf.Image("path/to/signature.png", 100, 80, 30, 0, false, "", 0, "")
+	var buf bytes.Buffer
+	err := pdf.Output(&buf)
+	if err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+func NewCourseService(courseRepository repository.CourseRepository, optionRepository repository.OptionRepository, examResultRepository repository.ExamResultRepository, imageCourseRepository repository.ImageCourseRepository, chapterRepository repository.ChapterRepository, lessonRepository repository.LessonRepository, userRepository repository.UserRepository, certificateRepository repository.CertificateRepository) CourseService {
+	return &CourseServiceImpl{CourseRepository: courseRepository, OptionRepository: optionRepository, ExamResultRepository: examResultRepository, ImageCourseRepository: imageCourseRepository, ChapterRepository: chapterRepository, LessonRepository: lessonRepository, UserRepository: userRepository, CertificateRepository: certificateRepository}
 }

@@ -13,10 +13,10 @@ import (
 )
 
 var (
-	client *ethclient.Client
-	token  *contracts.LINKToken
-	cert   *contracts.CertNFT
-	manage *contracts.EduManage
+	Client *ethclient.Client
+	Token  *contracts.LINKToken
+	Cert   *contracts.CertNFT
+	Manage *contracts.EduManage
 )
 
 func DialClient() *ethclient.Client {
@@ -31,10 +31,10 @@ func DialClient() *ethclient.Client {
 }
 
 func ConnectToLINKToken() {
-	client = DialClient()
+	Client = DialClient()
 	var err error
 	linkTokenAddress := common.HexToAddress("0x5FbDB2315678afecb367f032d93F642f64180aa3")
-	token, err = contracts.NewLINKToken(linkTokenAddress, client)
+	Token, err = contracts.NewLINKToken(linkTokenAddress, Client)
 	if err != nil {
 		log.Fatalf("Failed to instantiate a Token contract: %v", err)
 	}
@@ -42,7 +42,7 @@ func ConnectToLINKToken() {
 
 	time.Sleep(250 * time.Millisecond)
 
-	name, err := token.Name(&bind.CallOpts{})
+	name, err := Token.Name(&bind.CallOpts{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,10 +51,10 @@ func ConnectToLINKToken() {
 }
 
 func ConnectToCertNFT() {
-	client = DialClient()
+	Client = DialClient()
 	var err error
-	certNFTAddress := common.HexToAddress("0x5FC8d32690cc91D4c39d9d3abcBD16989F875707")
-	token, err = contracts.NewLINKToken(certNFTAddress, client)
+	certNFTAddress := common.HexToAddress("0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512")
+	Cert, err = contracts.NewCertNFT(certNFTAddress, Client)
 	if err != nil {
 		log.Fatalf("Failed to instantiate a CertNFT contract: %v", err)
 	}
@@ -64,10 +64,10 @@ func ConnectToCertNFT() {
 }
 
 func ConnectToEduManage() {
-	client = DialClient()
+	Client = DialClient()
 	var err error
-	eduManageAddress := common.HexToAddress("0x0165878A594ca255338adfa4d48449f69242Eb8F")
-	token, err = contracts.NewLINKToken(eduManageAddress, client)
+	eduManageAddress := common.HexToAddress("0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0")
+	Manage, err = contracts.NewEduManage(eduManageAddress, Client)
 	if err != nil {
 		log.Fatalf("Failed to instantiate a EduManage contract: %v", err)
 	}
@@ -91,14 +91,14 @@ func AuthGenerator(client *ethclient.Client) *bind.TransactOpts {
 	return auth
 }
 
-func GetTokenInstance() *contracts.LINKToken {
-	return token
-}
+// func GetTokenInstance() *contracts.LINKToken {
+// 	return token
+// }
 
-func GetCertNFTInstance() *contracts.CertNFT {
-	return cert
-}
+// func GetCertNFTInstance() *contracts.CertNFT {
+// 	return cert
+// }
 
-func GetEduManageInstance() *contracts.EduManage {
-	return manage
-}
+// func GetEduManageInstance() *contracts.EduManage {
+// 	return manage
+// }

@@ -45,6 +45,22 @@ func (c *QuestionControllerImpl) Create(ctx *gin.Context) {
 		helper.APIResponse(200, "question title is successfully created", questionResponse))
 }
 
+func (c *QuestionControllerImpl) CreateQuestionWithOptions(ctx *gin.Context) {
+	input := web.ListQuestionCreateInput{}
+	err := ctx.ShouldBindJSON(&input)
+	helper.PanicIfError(err)
+
+	courseId, _ := strconv.Atoi(ctx.Param("courseId"))
+	input.CourseId = courseId
+
+	authorId := ctx.MustGet("current_author").(web.AuthorResponse).Id
+	input.AuthorId = authorId
+
+	response := c.QuestionService.CreateWithOptions(input)
+	ctx.JSON(200,
+		helper.APIResponse(200, "question title is successfully created", response))
+}
+
 func NewQuestionController(questionService service.QuestionService) QuestionController {
 	return &QuestionControllerImpl{QuestionService: questionService}
 }

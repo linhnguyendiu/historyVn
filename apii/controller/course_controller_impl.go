@@ -32,10 +32,21 @@ func (c *CourseControllerImpl) GetByTypeAndCategory(ctx *gin.Context) {
 
 func (c *CourseControllerImpl) GetByUserId(ctx *gin.Context) {
 	userId := ctx.MustGet("current_user").(web.UserResponse).Id
-	courseResponses := c.CourseService.FindByUserId(userId)
+	courseResponses := c.CourseService.FindAllCourseIdByUserId(userId)
 
 	ctx.JSON(200,
 		helper.APIResponse(200, "List of courses", courseResponses),
+	)
+}
+
+func (c *CourseControllerImpl) GetResultByUserId(ctx *gin.Context) {
+	userId := ctx.MustGet("current_user").(web.UserResponse).Id
+	courseId, err := strconv.Atoi(ctx.Param("courseId"))
+	helper.PanicIfError(err)
+	courseResponses := c.CourseService.FindResultById(userId, courseId)
+
+	ctx.JSON(200,
+		helper.APIResponse(200, "Result", courseResponses),
 	)
 }
 
@@ -113,12 +124,41 @@ func (c *CourseControllerImpl) GetExamScore(ctx *gin.Context) {
 	helper.PanicIfError(err)
 	request.CourseId = courseId
 
-	authorId := ctx.MustGet("current_author").(web.AuthorResponse).Id
-	request.UserId = authorId
+	userId := ctx.MustGet("current_user").(web.UserResponse).Id
+	request.UserId = userId
 
 	examResultResponse := c.CourseService.GetScore(ctx, request)
 
 	ctx.JSON(http.StatusOK, gin.H{"result": examResultResponse})
+}
+
+func (c *CourseControllerImpl) EnrollCourse(ctx *gin.Context) {
+	request := web.EnrollCourseInput{}
+
+	courseId, err := strconv.Atoi(ctx.Param("courseId"))
+	helper.PanicIfError(err)
+	request.CourseId = courseId
+
+	userId := ctx.MustGet("current_user").(web.UserResponse).Id
+	request.UserId = userId
+
+	enrollCourseResponse := c.CourseService.EnrollCourse(request)
+
+	ctx.JSON(http.StatusOK, gin.H{"transaction": enrollCourseResponse})
+}
+
+func (c *CourseControllerImpl) UsersCompletedCourse(ctx *gin.Context) {
+	user := ctx.MustGet("current_user").(web.UserResponse)
+	courseId, err := strconv.Atoi(ctx.Param("courseId"))
+	helper.PanicIfError(err)
+
+	reponse, err := c.CourseService.IsCourseCompletedByUser(user.Id, courseId)
+	helper.PanicIfError(err)
+
+	ctx.JSON(200,
+		helper.APIResponse(200, "Success to enrolled",
+			gin.H{"enrolled_by": user.FirstName, "is_complete": reponse}),
+	)
 }
 
 func NewCourseController(courseService service.CourseService) CourseController {

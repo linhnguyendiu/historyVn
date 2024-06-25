@@ -1,13 +1,19 @@
 package web
 
 type LessonContentCreateInput struct {
-	AuthorId int
-	CourseId int
-	LessonId int
-	Content  string `json:"content"`
-	Type     int    `json:"type"`
-	Title    string `json:"title"`
-	InOrder  int    `json:"in_order"`
+	AuthorId     int
+	LessonId     int
+	Content      string `json:"content"`
+	Type         int    `json:"type"`
+	Title        string `json:"title"`
+	InOrder      int    `json:"in_order"`
+	Illustration string `json:"illustration"`
+}
+
+type ListLessonContentCreateInput struct {
+	AuthorId       int
+	LessonId       int
+	LessonContents []LessonContentCreateInput `json:"lesson_contents"`
 }
 
 type LessonContentUpdateInput struct {

@@ -29,6 +29,22 @@ func (r *ImageCourseRepositoryImpl) FindByCourseId(courseId int) ([]domain.Image
 	return images, nil
 }
 
+func (r *ImageCourseRepositoryImpl) GetRandomImageByCourse(courseID int) (domain.ImageCourse, error) {
+	var image domain.ImageCourse
+	// randSource := rand.NewSource(time.Now().UnixNano())
+	// rand.New(randSource)
+
+	// Query the database for a random image of the given course and image type
+	query := `SELECT * FROM image_courses WHERE course_id = ? ORDER BY RAND(), image_courses.id LIMIT 1`
+	err := r.db.Raw(query, courseID).Scan(&image).Error
+	// err := r.db.Where("course_id = ?", courseID).Order("RAND()").First(&image)
+	if image.Id == 0 || err != nil {
+		return image, errors.New("image not found")
+	}
+
+	return image, nil
+}
+
 func (r *ImageCourseRepositoryImpl) FindById(ctId int) (domain.ImageCourse, error) {
 	image := domain.ImageCourse{}
 	err := r.db.Find(&image, "id=?", ctId).Error
