@@ -56,7 +56,7 @@ func ServiceAccount(secretFile string) *http.Client {
 
 func CreateFile(name string, size int64, content []byte) (string, error) {
 
-	client := ServiceAccount("helper/client_secret.json")
+	//client := ServiceAccount("helper/client_secret.json")
 
 	srv, err := drive.NewService(context.Background(), option.WithHTTPClient(client))
 	if err != nil {
