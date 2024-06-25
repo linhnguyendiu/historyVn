@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -13,6 +13,7 @@ contract CertificateNFT is ERC721Enumerable, AccessControl, Ownable {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     struct Certificate {
+        uint256 tokenId;
         string name;
         string course;
         uint256 date;
@@ -29,6 +30,7 @@ contract CertificateNFT is ERC721Enumerable, AccessControl, Ownable {
     }
 
     function mintCertificate(
+        uint256 newTokenId,
         address recipient, 
         string memory name,
         string memory course,
@@ -40,11 +42,9 @@ contract CertificateNFT is ERC721Enumerable, AccessControl, Ownable {
         onlyRole(MINTER_ROLE)
         returns (uint256)
     {
-        uint256 newTokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
 
         _safeMint(recipient, newTokenId); // Mint to the specified recipient's address
-        _certificates[newTokenId] = Certificate(name, course, date, cerType, imageUri);
+        _certificates[newTokenId] = Certificate(newTokenId, name, course, date, cerType, imageUri);
         return newTokenId;
     }
 

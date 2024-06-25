@@ -8,8 +8,8 @@ contract EduManage {
     LINKToken public LINK;
     CertificateNFT public CertNFT;
     uint256 public postTokenReward = 1;
-    uint256 public postPointToReward = 1000;
-    uint256 public decimals = 18;
+    uint256 public postPointToReward = 10;
+    uint256 public decimals = 8;
 
     struct Student {
         uint256 id;
@@ -20,6 +20,7 @@ contract EduManage {
 
     struct Grade {
         uint256 mark;
+        string hashResultExam;
         bool isSet;
         bool isReceiveReward;
         bool isMintCert;
@@ -54,6 +55,16 @@ contract EduManage {
     mapping(address => bool) hasAccount;
     mapping(uint256 => mapping(uint256 => Grade)) public grades;
 
+    event CertificateMinted(
+        address recipient,
+        uint256 tokenId,
+        string name,
+        string course,
+        uint256 date,
+        string cerType,
+        string imageUri
+    );
+
     constructor(address _tokenAddress, address _NFTAddress) {
         owner = msg.sender;
         LINK = LINKToken(_tokenAddress);
@@ -61,7 +72,7 @@ contract EduManage {
     }
     
     function addStudent(address stu_add, uint256 stu_id, string memory name) public {
-        require(!hasAccount[msg.sender], "Address already has account");
+        require(!hasAccount[stu_add], "Address already has account");
         studentCount++;
         students[stu_id].id = stu_id;
         students[stu_id].stu_name = name;
@@ -71,6 +82,7 @@ contract EduManage {
 
     function addPost(uint256 post_id, address owner_add) public {
         require(hasAccount[owner_add], "Not authorized to add post"); 
+        require(posts[post_id].id == 0, "Post had created"); 
         postCount++;
         posts[post_id].id = post_id;
         posts[post_id].owner = owner_add;
@@ -85,6 +97,7 @@ contract EduManage {
         string memory hashCourse
     ) public {
         require(msg.sender == owner, "Not authorized to add course"); 
+        require(courses[course_id].id == 0, "Course had created"); 
         courseCount++;
         courses[course_id].id = course_id;
         courses[course_id].name = name;
@@ -133,17 +146,19 @@ contract EduManage {
     function submitGrade(
         uint256 stu_id,
         uint256 course_id,
-        uint256 _mark 
+        uint256 _mark ,
+        string memory hash_result_exam
         ) public returns (bool) {
             require(checkEnrolledCourse(stu_id, course_id), "Not authorized to submit exam");
             require(!grades[stu_id][course_id].isSet, "Your mark is update"); 
-            grades[stu_id][course_id] = Grade(_mark, true, false, false);
+            grades[stu_id][course_id] = Grade(_mark, hash_result_exam, true, false, false);
         return true;
     }
 
     function checkAndTransferRewardCourse(
         uint256 stu_id,
         uint256 course_id,
+        uint256 token_id,
         string memory image_uri
         ) public payable {
             require(grades[stu_id][course_id].isSet, "Please take exam");
@@ -152,33 +167,36 @@ contract EduManage {
             uint256 _mark = grades[stu_id][course_id].mark; 
             if (10 >=_mark && _mark >= 9) {
                 rewardToken(students[stu_id].stuAdd, courses[course_id].reward);
-                CertNFT.mintCertificate(students[stu_id].stuAdd, students[stu_id].stu_name, 
+                CertNFT.mintCertificate(token_id, students[stu_id].stuAdd, students[stu_id].stu_name, 
+                courses[course_id].name, block.timestamp, courses[course_id].courseType, image_uri);
+                emit CertificateMinted(students[stu_id].stuAdd, token_id, students[stu_id].stu_name, 
                 courses[course_id].name, block.timestamp, courses[course_id].courseType, image_uri);
                 grades[stu_id][course_id].isReceiveReward = true;
                 grades[stu_id][course_id].isMintCert = true;
             } else if (_mark >= 7) {
-                CertNFT.mintCertificate(students[stu_id].stuAdd, students[stu_id].stu_name, 
+                CertNFT.mintCertificate(token_id, students[stu_id].stuAdd, students[stu_id].stu_name, 
+                courses[course_id].name, block.timestamp, courses[course_id].courseType, image_uri);
+                emit CertificateMinted(students[stu_id].stuAdd, token_id, students[stu_id].stu_name, 
                 courses[course_id].name, block.timestamp, courses[course_id].courseType, image_uri);
                 grades[stu_id][course_id].isMintCert = true;
             } else {
                 revert("Sorry, you have failed exam.");
             }
+
     }
 
     //tranferRewardPost  1000point => check + post - msg.sender, add post ?? address owner post + id post + point + check reject 
     function checkAndTransferRewardPost(
         uint256 post_id,
-        uint256 point,
-        uint256 reject_count
+        uint256 point
         ) public payable {
             posts[post_id].point = point;
-            posts[post_id].rejectCount = reject_count;
-            if (point == postPointToReward*(posts[post_id].rewardCount+1) && posts[post_id].rejectCount <= 3) {
+            if (point == postPointToReward*(posts[post_id].rewardCount+1)) {
                 rewardToken(posts[post_id].owner, postTokenReward);
                 posts[post_id].rewardCount++;
             }
             else {
-                revert("Sorry, you don't have enough point to take reward token in this post or your post have a lot of reject");
+                revert("Sorry, you don't have enough point to take reward token in this post");
             }
     }
 
