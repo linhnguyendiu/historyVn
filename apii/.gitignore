@@ -6,3 +6,4 @@ test/assets
 note.md
 database.sql
 docs/note.txt
+helper/client_secret.json
