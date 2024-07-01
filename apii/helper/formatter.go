@@ -200,6 +200,13 @@ func ToQuestionsResponse(questions []domain.Question) []web.QuestionResponse {
 	return questionResponses
 }
 
+func ToListQuestionResponse(question web.ListQuestionResponse) web.ListQuestionResponse {
+	return web.ListQuestionResponse{
+		DurationQuiz: question.DurationQuiz,
+		QuizzesCount: question.QuizzesCount,
+		Questions:    question.Questions,
+	}
+}
 func ToMidtransTransactionResponse(transaction domain.Transaction, trxID string) web.MidtransTransactionResponse {
 	return web.MidtransTransactionResponse{
 		Id:         trxID,

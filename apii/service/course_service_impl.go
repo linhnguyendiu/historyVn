@@ -9,15 +9,16 @@ import (
 	"go-pzn-restful-api/model/domain"
 	"go-pzn-restful-api/model/web"
 	"go-pzn-restful-api/repository"
+	"image"
 	"log"
 	"math/big"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/fogleman/gg"
 	"github.com/go-redis/redis"
-	"github.com/jung-kurt/gofpdf"
-	"github.com/jung-kurt/gofpdf/contrib/httpimg"
 )
 
 type CourseServiceImpl struct {
@@ -473,7 +474,7 @@ func (s *CourseServiceImpl) GetScore(ctx context.Context, request web.ExamReques
 
 			size := int64(len(certificatePDF))
 
-			driveFileID, err := helper.CreateFile(cert.CourseName+".pdf", size, certificatePDF)
+			driveFileID, err := helper.CreateFile(cert.CourseName+cert.UserName+".png", size, certificatePDF)
 			if err != nil {
 				panic(helper.NewNotFoundError(err.Error()))
 			}
@@ -544,37 +545,66 @@ func (s *CourseServiceImpl) IsCourseCompletedByUser(userId int, courseId int) (b
 	return false, nil
 }
 
-func GenerateCertPDF(req domain.Certificate) ([]byte, error) {
-	// Tạo file PDF
-	pdf := gofpdf.New("P", "mm", "A6", "")
-	pdf.AddPage()
+func GenerateCertPDF(cert domain.Certificate) ([]byte, error) {
+	// Tạo khung ảnh với kích thước cố định
+	const widthPx, heightPx = 1200, 800
+	dc := gg.NewContext(widthPx, heightPx)
 
-	// // Thêm logo
-	// pdf.Image("../assets/c", 10, 10, 30, 0, false, "", 0, "")
+	// Background màu trắng
+	dc.SetRGB(1, 1, 1)
+	dc.Clear()
 
-	// Thêm tiêu đề
-	pdf.SetFont("Arial", "B", 16)
-	pdf.Cell(40, 10, "CERTIFICATE OF AUTHENTICITY")
-
-	// Thêm hình ảnh minh họa
-	httpimg.Register(pdf, req.ImageUri, "")
-	if pdf.Err() {
-		log.Printf("error registering image %s: %s", req.ImageUri, pdf.Error())
-		pdf.ClearError()
+	// Vẽ tiêu đề chứng chỉ
+	dc.SetRGB(0, 0, 0)
+	if err := dc.LoadFontFace("assets/font/BeVietnamPro-Black.ttf", 36); err != nil {
+		return nil, err
 	}
-	pdf.Image(req.ImageUri, 10, 30, 80, 0, false, "", 0, "")
+	dc.DrawStringAnchored("CHỨNG NHẬN HOÀN THÀNH KHÓA HỌC", widthPx/2, 100, 0.5, 0.5)
 
-	// Thêm thông tin người học và khóa học
-	pdf.SetXY(100, 30)
-	pdf.SetFont("Arial", "B", 14)
-	pdf.MultiCell(100, 10, req.UserName, "", "L", false)
-	pdf.MultiCell(100, 10, req.CourseName, "", "L", false)
-	// pdf.MultiCell(100, 10, req.Date, "", "L", false)
+	// Vẽ hình ảnh chính
+	response, err := http.Get(cert.ImageUri)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
 
-	// // Thêm chữ ký
-	// pdf.Image("path/to/signature.png", 100, 80, 30, 0, false, "", 0, "")
+	if response.StatusCode != 200 {
+		return nil, errors.New("received non 200 response code")
+	}
+
+	img, _, err := image.Decode(response.Body)
+	if err != nil {
+		return nil, err
+	}
+	// imgWidth, imgHeight := 300, 450
+	dc.DrawImageAnchored(img, 200, 400, 0.5, 0.5)
+
+	// Vẽ viền (border) cho phần text
+	borderX := 550.0
+	borderY := 150.0
+	borderHeight := 500.0
+	borderThickness := 2.0
+
+	dc.SetLineWidth(borderThickness)
+	dc.SetRGB(0, 0, 0)
+	dc.DrawLine(borderX, borderY, borderX, borderY+borderHeight)
+	dc.Stroke()
+
+	// Vẽ thông tin chi tiết chứng chỉ
+	if err := dc.LoadFontFace("assets/font/BeVietnamPro-Black.ttf", 24); err != nil {
+		return nil, err
+	}
+	startX := 700.0
+	startY := 200.0
+	lineHeight := 40.0
+
+	dc.DrawStringAnchored(cert.UserName, startX, startY, 0, 0.5)
+	dc.DrawStringAnchored(cert.CourseName, startX, startY+lineHeight*2, 0, 0.5)
+	dc.DrawStringAnchored(cert.Date.String(), startX, startY+4*lineHeight, 0, 0.5)
+	dc.DrawStringAnchored(cert.CertType, startX, startY+6*lineHeight, 0, 0.5)
+
 	var buf bytes.Buffer
-	err := pdf.Output(&buf)
+	err = dc.EncodePNG(&buf)
 	if err != nil {
 		return nil, err
 	}

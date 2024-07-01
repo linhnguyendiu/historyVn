@@ -13,6 +13,12 @@ type ListQuestionCreateInput struct {
 	Questions []QuestionResponse `json:"questions"`
 }
 
+type ListQuestionResponse struct {
+	DurationQuiz int                `json:"duration_quiz"`
+	QuizzesCount int                `json:"quizzes_count"`
+	Questions    []QuestionResponse `json:"questions"`
+}
+
 type QuestionResponse struct {
 	Id       int              `json:"id"`
 	CourseId int              `json:"course_id"`

@@ -28,6 +28,6 @@ type CourseResponse struct {
 	DurationQuiz    int    `json:"duration_quiz"`
 	DurationToLearn int
 	LessonsCount    int
-	QuizzesCount    int
+	QuizzesCount    int `json:"quizzes_count"`
 	HashCourse      string
 }

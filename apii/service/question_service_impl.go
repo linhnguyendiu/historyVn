@@ -16,11 +16,21 @@ type QuestionServiceImpl struct {
 	repository.CourseRepository
 }
 
-func (s *QuestionServiceImpl) FindByCourseId(courseId int) []web.QuestionResponse {
+func (s *QuestionServiceImpl) FindByCourseId(courseId int) web.ListQuestionResponse {
 	questions, err := s.QuestionRepository.FindByCourseId(courseId)
 	if err != nil {
 		panic(helper.NewNotFoundError(err.Error()))
 	}
+
+	listQuestionsResponse := web.ListQuestionResponse{}
+
+	course, err := s.CourseRepository.FindById(courseId)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	listQuestionsResponse.DurationQuiz = course.DurationQuiz
+	listQuestionsResponse.QuizzesCount = course.QuizzesCount
 
 	questionsResponse := []web.QuestionResponse{}
 	for _, question := range questions {
@@ -33,7 +43,9 @@ func (s *QuestionServiceImpl) FindByCourseId(courseId int) []web.QuestionRespons
 		questionsResponse = append(questionsResponse, questionResponse)
 	}
 
-	return questionsResponse
+	listQuestionsResponse.Questions = questionsResponse
+
+	return helper.ToListQuestionResponse(listQuestionsResponse)
 }
 
 func (s *QuestionServiceImpl) Create(input web.QuestionCreateInput) web.QuestionResponse {
@@ -59,6 +71,14 @@ func (s *QuestionServiceImpl) CreateWithOptions(input web.ListQuestionCreateInpu
 	}
 	if course.AuthorId != input.AuthorId {
 		panic(helper.NewUnauthorizedError("You're not an author of this course"))
+	}
+
+	total, err := s.CourseRepository.GetTotalQuestionsByCourseId(course.Id)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+	if total > 0 {
+		panic(helper.NewBadRequestError("This course already has questions"))
 	}
 
 	for _, questionInput := range input.Questions {
