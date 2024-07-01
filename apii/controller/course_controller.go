@@ -6,6 +6,7 @@ type CourseController interface {
 	Create(ctx *gin.Context)
 	GetByType(ctx *gin.Context)
 	GetByAuthorId(ctx *gin.Context)
+	GetByCourseId(ctx *gin.Context)
 	GetByUserId(ctx *gin.Context)
 	GetByCategory(ctx *gin.Context)
 	GetTop3Course(ctx *gin.Context)

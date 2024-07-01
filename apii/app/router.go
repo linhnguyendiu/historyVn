@@ -215,6 +215,7 @@ func NewRouter() *gin.Engine {
 	v1.GET("/courses/type/:type/categories/:cateName", courseController.GetByTypeAndCategory)
 	v1.GET("/courses/enrolled", middleware.UserJwtAuthMiddleware(jwtAuth, userService), courseController.GetByUserId)
 	v1.POST("/courses/:courseId/enrollCourse", middleware.UserJwtAuthMiddleware(jwtAuth, userService), courseController.EnrollCourse)
+	v1.GET("/overview/courses/:courseId", middleware.UserJwtAuthMiddleware(jwtAuth, userService), courseController.GetByCourseId)
 
 	v1.POST("/courses/:courseId/enrolled", middleware.UserJwtAuthMiddleware(jwtAuth, userService), courseController.UserEnrolled)
 

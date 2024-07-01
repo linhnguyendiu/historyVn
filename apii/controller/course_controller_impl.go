@@ -50,6 +50,14 @@ func (c *CourseControllerImpl) GetResultByUserId(ctx *gin.Context) {
 	)
 }
 
+func (c *CourseControllerImpl) GetByCourseId(ctx *gin.Context) {
+	courseId, _ := strconv.Atoi(ctx.Param("courseId"))
+	courseResponse := c.CourseService.FindById(courseId)
+
+	ctx.JSON(200,
+		helper.APIResponse(200, "Overview course", courseResponse))
+}
+
 func (c *CourseControllerImpl) UserEnrolled(ctx *gin.Context) {
 	user := ctx.MustGet("current_user").(web.UserResponse)
 	courseId, err := strconv.Atoi(ctx.Param("courseId"))
