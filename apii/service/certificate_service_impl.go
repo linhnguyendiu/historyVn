@@ -59,20 +59,6 @@ func GenerateCertificatePDF(cert domain.Certificate) ([]byte, error) {
 	dc.SetRGB(1, 1, 1)
 	dc.Clear()
 
-	// // Vẽ logo
-	// logoSize := 100.0
-	// logoURI := "path/to/logo.png"
-	// logoFile, err := os.Open(logoURI)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// defer logoFile.Close()
-	// logoImg, _, err := image.Decode(logoFile)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// dc.DrawImageAnchored(logoImg, int(logoSize/2)+20, int(logoSize/2)+20, 0.5, 0.5)
-
 	// Vẽ tiêu đề chứng chỉ
 	dc.SetRGB(0, 0, 0)
 	if err := dc.LoadFontFace("assets/font/BeVietnamPro-Black.ttf", 36); err != nil {
@@ -122,20 +108,6 @@ func GenerateCertificatePDF(cert domain.Certificate) ([]byte, error) {
 	dc.DrawStringAnchored(cert.Date.String(), startX, startY+4*lineHeight, 0, 0.5)
 	dc.DrawStringAnchored(cert.CertType, startX, startY+6*lineHeight, 0, 0.5)
 
-	// Vẽ chữ ký (giả sử bạn có tệp ảnh chữ ký)
-	// signatureURI := "path/to/signature.png"
-	// signatureFile, err := os.Open(signatureURI)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// defer signatureFile.Close()
-	// signatureImg, _, err := image.Decode(signatureFile)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// dc.DrawImageAnchored(signatureImg, int(startX+100), int(startY+5*lineHeight), 0.5, 0.5)
-
-	// Vẽ thông tin đăng ký blockchain
 	var buf bytes.Buffer
 	err = dc.EncodePNG(&buf)
 	if err != nil {

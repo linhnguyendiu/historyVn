@@ -9,6 +9,7 @@ import (
 	"go-pzn-restful-api/service"
 	"log"
 	"math/big"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/gin-contrib/cors"
@@ -103,7 +104,16 @@ func NewRouter() *gin.Engine {
 	// manage := helper.GetEduManageInstance()
 
 	router := gin.Default()
-	router.Use(cors.Default())
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowMethods = []string{"POST", "GET", "PUT", "OPTIONS"}
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Accept", "User-Agent", "Cache-Control", "Pragma"}
+	config.ExposeHeaders = []string{"Content-Length"}
+	config.AllowCredentials = true
+	config.MaxAge = 12 * time.Hour
+
+	router.Use(cors.New(config))
+	// router.Use(cors.Default())
 	router.Use(gin.CustomRecovery(middleware.ErrorHandler))
 
 	v1 := router.Group("/api/v1")
