@@ -25,3 +25,26 @@ type UserResponse struct {
 	Balance   int    `json:"balance"`
 	Rank      int    `json:"rank"`
 }
+
+type UserRankResponse struct {
+	Id        int    `json:"id"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+	Address   string `json:"address"`
+	Avatar    string `json:"avatar"`
+	Balance   int    `json:"balance"`
+	Rank      int    `json:"rank"`
+}
+
+type UserDetailResponse struct {
+	Id        int    `json:"id"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+	Address   string `json:"address"`
+	Avatar    string `json:"avatar"`
+	Balance   int    `json:"balance"`
+	Rank      int    `json:"rank"`
+	LastRank  int
+}

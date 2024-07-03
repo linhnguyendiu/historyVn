@@ -117,8 +117,8 @@ func GenerateCertificatePDF(cert domain.Certificate) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (s *CertificateServiceImpl) FindById(certId int) web.CertificateResponse {
-	findById, err := s.CertificateRepository.FindById(certId)
+func (s *CertificateServiceImpl) FindById(certId int, userId int) web.CertificateResponse {
+	findById, err := s.CertificateRepository.FindById(certId, userId)
 	if err != nil {
 		panic(helper.NewNotFoundError(err.Error()))
 	}

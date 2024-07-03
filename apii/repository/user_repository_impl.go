@@ -64,6 +64,107 @@ func (r *UserRepositoryImpl) Delete(userId int) {
 	helper.PanicIfError(err)
 }
 
+func (r *UserRepositoryImpl) DescBalanceUser(limit int) ([]domain.User, error) {
+	users := []domain.User{}
+	if err := r.db.Table("users").
+		Order("balance DESC").
+		Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	// Cập nhật rank
+	var currentRank int = 1
+	var sameRankCount int = 0
+	var currentBalance *int
+
+	for i := range users {
+		if currentBalance == nil || users[i].Balance != *currentBalance {
+			currentRank += sameRankCount
+			sameRankCount = 0
+		} else {
+			sameRankCount++
+		}
+		users[i].Rank = currentRank
+		currentBalance = &users[i].Balance
+	}
+
+	// Lọc danh sách người dùng theo thứ hạng từ 1 đến limit
+	topRankedUsers := []domain.User{}
+	for _, user := range users {
+		if user.Rank <= limit {
+			topRankedUsers = append(topRankedUsers, user)
+		}
+	}
+
+	// Cập nhật thứ hạng trong database
+	for _, user := range topRankedUsers {
+		if err := r.db.Table("users").Where("id = ?", user.Id).Update("rank", user.Rank).Error; err != nil {
+			return nil, err
+		}
+	}
+
+	return topRankedUsers, nil
+}
+
+// Hàm tính toán thứ hạng cho tất cả người dùng
+func (r *UserRepositoryImpl) CalculateUserRanks() ([]domain.User, error) {
+	users := []domain.User{}
+	if err := r.db.Table("users").
+		Order("balance DESC").
+		Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	// Nếu không có người dùng nào
+	if len(users) == 0 {
+		return nil, errors.New("no users found")
+	}
+
+	// Cập nhật rank
+	var currentRank int = 1
+	var sameRankCount int = 0
+	var currentBalance *int
+
+	for i := range users {
+		if currentBalance == nil || users[i].Balance != *currentBalance {
+			currentRank += sameRankCount
+			sameRankCount = 0
+		} else {
+			sameRankCount++
+		}
+		users[i].Rank = currentRank
+		currentBalance = &users[i].Balance
+	}
+
+	return users, nil
+}
+
+// Hàm lấy thứ hạng của một người dùng cụ thể
+func (r *UserRepositoryImpl) GetUserRank(userID int) (int, error) {
+	users, err := r.CalculateUserRanks()
+	if err != nil {
+		return 0, err
+	}
+
+	for _, user := range users {
+		if user.Id == userID {
+			return user.Rank, nil
+		}
+	}
+
+	return 0, errors.New("user with ID not found")
+}
+
+// Hàm lấy thứ hạng của người dùng đứng cuối cùng
+func (r *UserRepositoryImpl) GetLastUserRank() (int, error) {
+	users, err := r.CalculateUserRanks()
+	if err != nil {
+		return 0, err
+	}
+
+	return users[len(users)-1].Rank, nil
+}
+
 func NewUserRepository(db *gorm.DB) UserRepository {
 	return &UserRepositoryImpl{db: db}
 }

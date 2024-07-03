@@ -3,18 +3,24 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
 	"go-pzn-restful-api/helper"
 	"go-pzn-restful-api/model/domain"
 	"go-pzn-restful-api/model/web"
 	"go-pzn-restful-api/repository"
+	"log"
+	"math/big"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 type PostServiceImpl struct {
 	repository.PostRepository
 	repository.CommentRepository
+	repository.RewardRepository
 	CommentService
 	UserService
 }
@@ -148,6 +154,19 @@ func (s *PostServiceImpl) Create(request web.PostCreateInput) web.PostBySearchRe
 
 	save := s.PostRepository.Save(post)
 
+	auth := helper.AuthGenerator(helper.Client)
+	add, err := helper.Manage.AddPost(auth, big.NewInt(int64(save.Id)), common.HexToAddress(user.Address))
+	if err != nil {
+		helper.PanicIfError(err)
+	}
+	log.Printf("add successfull", add)
+
+	getPost, err := helper.Manage.GetPosts(&bind.CallOpts{}, big.NewInt(int64(save.Id)))
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("getPost", getPost)
+
 	return helper.ToPostBySearchResponse(save)
 }
 
@@ -192,7 +211,7 @@ func (s *PostServiceImpl) LikePost(ctx context.Context, userId int, postId int) 
 	// 	}
 	// }
 
-	return postUpdate.Likes, didUserLike, nil
+	return postUpdate.Likes, !didUserLike, nil
 }
 
 func (s *PostServiceImpl) DisLikePost(ctx context.Context, userId int, postId int) (int, bool, error) {
@@ -226,8 +245,42 @@ func CalculatePoints(likes, dislikes, commCount int) int {
 	return likes - dislikes + 3*commCount
 }
 
-func RewardPost(postId int) {
-	fmt.Printf("Rewarding post with ID %d...\n", postId)
+func (s *PostServiceImpl) RewardPost(postId int, point int) {
+	eduManageAddress := common.HexToAddress("0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0")
+	balance1, err := helper.Token.BalanceOf(&bind.CallOpts{}, eduManageAddress)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	auth := helper.AuthGenerator(helper.Client)
+	add, err := helper.Manage.CheckAndTransferRewardPost(auth, big.NewInt(int64(postId)), big.NewInt(int64(point)))
+	if err != nil {
+		helper.PanicIfError(err)
+	}
+	log.Printf("post, reward", add)
+
+	balance2, err := helper.Token.BalanceOf(&bind.CallOpts{}, eduManageAddress)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	post, err := s.PostRepository.FindById(postId)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+	txHash := add.Hash().Hex()
+	rewardDetail := domain.RewardHistory{}
+	rewardDetail.RewardAddress = txHash
+	rewardDetail.UserId = post.UserId
+	rewardDetail.RewardType = 1
+	balance1Int64 := balance1.Int64()
+	balance2Int64 := balance2.Int64()
+	rewardDetail.CountReward = (int(balance1Int64) - int(balance2Int64)) / 100000000
+	rewardDetail.RewardAt = time.Now()
+
+	save := s.RewardRepository.Save(rewardDetail)
+	log.Printf("post, reward", save)
+
 }
 
 // ProcessPosts processes all posts for points calculation and rewards
@@ -240,14 +293,19 @@ func (s *PostServiceImpl) ProcessPosts() bool {
 	for _, post := range posts {
 		post.CommentCount, _ = s.PostRepository.GetTotalCommentByPostId(post.Id)
 		post.Points = CalculatePoints(post.Likes, post.Dislikes, int(post.CommentCount))
-		if post.Points > 1000 {
-			RewardPost(post.Id)
-		}
 		s.PostRepository.Update(post)
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					log.Printf("post not enough to reward %d: %v\n", post.Id, r)
+				}
+			}()
+			s.RewardPost(post.Id, post.Points)
+		}()
 	}
 	return true
 }
 
-func NewPostService(postRepository repository.PostRepository, commentRepository repository.CommentRepository, commentService CommentService, userService UserService) PostService {
-	return &PostServiceImpl{PostRepository: postRepository, CommentRepository: commentRepository, CommentService: commentService, UserService: userService}
+func NewPostService(postRepository repository.PostRepository, commentRepository repository.CommentRepository, commentService CommentService, userService UserService, rewardRepository repository.RewardRepository) PostService {
+	return &PostServiceImpl{PostRepository: postRepository, CommentRepository: commentRepository, CommentService: commentService, UserService: userService, RewardRepository: rewardRepository}
 }

@@ -19,10 +19,10 @@ func (r *CertificateRepositoryImpl) Save(certificate domain.Certificate) domain.
 	return certificate
 }
 
-func (r *CertificateRepositoryImpl) FindById(certId int) (domain.Certificate, error) {
+func (r *CertificateRepositoryImpl) FindById(certId int, userId int) (domain.Certificate, error) {
 	certificate := domain.Certificate{}
-	err := r.db.Find(&certificate, "id=?", certId).Error
-	if certificate.Id == 0 || err != nil {
+	err := r.db.First(&certificate, "id = ? AND user_id = ?", certId, userId).Error
+	if err != nil {
 		return certificate, errors.New("certificate not found")
 	}
 

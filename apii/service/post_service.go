@@ -15,4 +15,5 @@ type PostService interface {
 	LikePost(ctx context.Context, userId int, postId int) (int, bool, error)
 	DisLikePost(ctx context.Context, userId int, postId int) (int, bool, error)
 	ProcessPosts() bool
+	RewardPost(postId int, point int)
 }

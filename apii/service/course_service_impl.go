@@ -13,7 +13,6 @@ import (
 	"log"
 	"math/big"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
@@ -30,6 +29,7 @@ type CourseServiceImpl struct {
 	repository.LessonRepository
 	repository.UserRepository
 	repository.CertificateRepository
+	repository.RewardRepository
 }
 
 func (s *CourseServiceImpl) FindAllCourseIdByUserId(userId int) []web.CourseResponse {
@@ -136,8 +136,8 @@ func (s *CourseServiceImpl) FindAll() []web.CourseResponse {
 	return coursesResponse
 }
 
-func (s *CourseServiceImpl) FindTop3Coures() []web.CourseResponse {
-	courses, err := s.CourseRepository.FindTop3Course(3)
+func (s *CourseServiceImpl) FindTop4Coures() []web.CourseResponse {
+	courses, err := s.CourseRepository.FindTop3Course(4)
 	if err != nil {
 		panic(helper.NewNotFoundError(err.Error()))
 	}
@@ -480,6 +480,8 @@ func (s *CourseServiceImpl) GetScore(ctx context.Context, request web.ExamReques
 			}
 
 			cert.CertUri = driveFileID
+			cert.UserId = examResult.UserId
+			cert.CourseId = examResult.CourseId
 			certificateNFT := s.CertificateRepository.Save(cert)
 
 			log.Printf("cert", certificateNFT)
@@ -490,9 +492,22 @@ func (s *CourseServiceImpl) GetScore(ctx context.Context, request web.ExamReques
 			log.Printf("transac reward successfull", reward)
 			txHash := reward.Hash().Hex()
 			examResult.RewardAddress = txHash
-			examResult.CertificateAddress = strconv.Itoa(certificateNFT.Id)
+			examResult.CertificateId = certificateNFT.Id
 			findById.Balance = findById.Balance + course.Reward
+
+			rewardDetail := domain.RewardHistory{}
+			rewardDetail.RewardAddress = txHash
+			rewardDetail.UserId = examResult.UserId
+			rewardDetail.RewardType = 2
+			rewardDetail.CountReward = course.Reward
+			rewardDetail.RewardAt = time.Now()
+
+			save := s.RewardRepository.Save(rewardDetail)
+			log.Printf("post, reward", save)
 		}
+
+		save2 := s.UserRepository.Update(findById)
+		log.Printf("user save", save2)
 
 		save, err := s.ExamResultRepository.Update(examResult)
 		if err != nil {
@@ -612,6 +627,6 @@ func GenerateCertPDF(cert domain.Certificate) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func NewCourseService(courseRepository repository.CourseRepository, optionRepository repository.OptionRepository, examResultRepository repository.ExamResultRepository, imageCourseRepository repository.ImageCourseRepository, chapterRepository repository.ChapterRepository, lessonRepository repository.LessonRepository, userRepository repository.UserRepository, certificateRepository repository.CertificateRepository) CourseService {
-	return &CourseServiceImpl{CourseRepository: courseRepository, OptionRepository: optionRepository, ExamResultRepository: examResultRepository, ImageCourseRepository: imageCourseRepository, ChapterRepository: chapterRepository, LessonRepository: lessonRepository, UserRepository: userRepository, CertificateRepository: certificateRepository}
+func NewCourseService(courseRepository repository.CourseRepository, optionRepository repository.OptionRepository, examResultRepository repository.ExamResultRepository, imageCourseRepository repository.ImageCourseRepository, chapterRepository repository.ChapterRepository, lessonRepository repository.LessonRepository, userRepository repository.UserRepository, certificateRepository repository.CertificateRepository, rewardRepository repository.RewardRepository) CourseService {
+	return &CourseServiceImpl{CourseRepository: courseRepository, OptionRepository: optionRepository, ExamResultRepository: examResultRepository, ImageCourseRepository: imageCourseRepository, ChapterRepository: chapterRepository, LessonRepository: lessonRepository, UserRepository: userRepository, CertificateRepository: certificateRepository, RewardRepository: rewardRepository}
 }

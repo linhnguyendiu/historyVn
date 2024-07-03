@@ -234,7 +234,7 @@ func (s *CommentServiceImpl) ProcessComments() bool {
 		comment.CommentCount, _ = s.CommentRepository.CountCommentsByFatherId(comment.Id)
 		comment.Points = CalculatePoints(comment.Likes, comment.Dislikes, comment.CommentCount)
 		if comment.Points > 1000 {
-			RewardPost(comment.Id)
+			RewardComment(comment.Id)
 		}
 		s.CommentRepository.Update(comment)
 	}

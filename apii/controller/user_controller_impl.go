@@ -46,7 +46,7 @@ func (c *UserControllerImpl) UploadAvatar(ctx *gin.Context) {
 func (c *UserControllerImpl) GetById(ctx *gin.Context) {
 	// user_Id from token
 	user := ctx.MustGet("current_user").(web.UserResponse)
-	findById := c.UserService.FindById(user.Id)
+	findById := c.UserService.FindDetailById(user.Id)
 	ctx.JSON(
 		200,
 		helper.APIResponse(200, "Current user: "+findById.FirstName, findById),
@@ -63,6 +63,16 @@ func (c *UserControllerImpl) Login(ctx *gin.Context) {
 	ctx.JSON(
 		200,
 		helper.APIResponse(200, "You're logged in now", login),
+	)
+}
+
+func (c *UserControllerImpl) GetRanking(ctx *gin.Context) {
+
+	ranking := c.UserService.FindTop10User()
+
+	ctx.JSON(
+		200,
+		helper.APIResponse(200, "Get ranking", ranking),
 	)
 }
 

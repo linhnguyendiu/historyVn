@@ -9,7 +9,7 @@ type CourseController interface {
 	GetByCourseId(ctx *gin.Context)
 	GetByUserId(ctx *gin.Context)
 	GetByCategory(ctx *gin.Context)
-	GetTop3Course(ctx *gin.Context)
+	GetTop4Course(ctx *gin.Context)
 	GetAll(ctx *gin.Context)
 	UserEnrolled(ctx *gin.Context)
 	GetByKeyword(ctx *gin.Context)

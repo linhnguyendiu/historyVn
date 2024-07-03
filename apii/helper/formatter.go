@@ -16,8 +16,55 @@ func ToUserResponse(user domain.User) web.UserResponse {
 	userResponse.Balance = user.Balance
 	userResponse.Avatar = user.Avatar
 	userResponse.Token = user.Token
+	return userResponse
+}
+
+func ToUserDetailResponse(user domain.User, lastRankUser int) web.UserDetailResponse {
+	userResponse := web.UserDetailResponse{}
+	userResponse.Id = user.Id
+	userResponse.LastName = user.LastName
+	userResponse.FirstName = user.FirstName
+	userResponse.Email = user.Email
+	userResponse.Address = user.Address
+	userResponse.Rank = user.Rank
+	userResponse.Balance = user.Balance
+	userResponse.Avatar = user.Avatar
+	userResponse.LastRank = lastRankUser
+	return userResponse
+}
+
+func ToUserRankResponse(user domain.User) web.UserRankResponse {
+	userResponse := web.UserRankResponse{}
+	userResponse.Id = user.Id
+	userResponse.LastName = user.LastName
+	userResponse.FirstName = user.FirstName
+	userResponse.Email = user.Email
+	userResponse.Address = user.Address
+	userResponse.Rank = user.Rank
+	userResponse.Balance = user.Balance
+	userResponse.Avatar = user.Avatar
 
 	return userResponse
+}
+
+func ToUsersResponse(titles []domain.User) []web.UserResponse {
+	usersResponse := []web.UserResponse{}
+	for _, user := range titles {
+		userResponse := ToUserResponse(user)
+		usersResponse = append(usersResponse, userResponse)
+	}
+
+	return usersResponse
+}
+
+func ToUsersRankResponse(titles []domain.User) []web.UserRankResponse {
+	usersResponse := []web.UserRankResponse{}
+	for _, user := range titles {
+		userResponse := ToUserRankResponse(user)
+		usersResponse = append(usersResponse, userResponse)
+	}
+
+	return usersResponse
 }
 
 func ToAuthorResponse(author domain.Author) web.AuthorResponse {
@@ -239,15 +286,35 @@ func ToLessonResponse(title domain.Lesson) web.LessonResponse {
 
 func ToExamResultResponse(title domain.ExamResult) web.ExamResultResponse {
 	return web.ExamResultResponse{
-		CourseId:           title.CourseId,
-		UserId:             title.UserId,
-		Score:              title.Score,
-		SubmittedAt:        title.SubmittedAt,
-		TotalQuestions:     title.TotalQuestions,
-		RewardAddress:      title.RewardAddress,
-		CertificateAddress: title.CertificateAddress,
-		HashAnswer:         title.HashAnswer,
+		CourseId:       title.CourseId,
+		UserId:         title.UserId,
+		Score:          title.Score,
+		SubmittedAt:    title.SubmittedAt,
+		TotalQuestions: title.TotalQuestions,
+		RewardAddress:  title.RewardAddress,
+		CertificateId:  title.CertificateId,
+		HashAnswer:     title.HashAnswer,
 	}
+}
+
+func ToRewardHistoryResponse(title domain.RewardHistory) web.RewardHistoryResponse {
+	return web.RewardHistoryResponse{
+		UserId:        title.UserId,
+		RewardType:    title.RewardType,
+		RewardAt:      title.RewardAt,
+		RewardAddress: title.RewardAddress,
+		CountReward:   title.CountReward,
+	}
+}
+
+func ToRewardHistorysResponse(titles []domain.RewardHistory) []web.RewardHistoryResponse {
+	rewardHistorysResponse := []web.RewardHistoryResponse{}
+	for _, reward := range titles {
+		rewardResponse := ToRewardHistoryResponse(reward)
+		rewardHistorysResponse = append(rewardHistorysResponse, rewardResponse)
+	}
+
+	return rewardHistorysResponse
 }
 
 func ToChapterResponse(title domain.Chapter) web.ChapterResponse {
@@ -312,6 +379,8 @@ func ToEnrollCourseResponse(title domain.ExamResult) web.EnrollCourseResponse {
 func ToCertificateResponse(cert domain.Certificate) web.CertificateResponse {
 	return web.CertificateResponse{
 		Id:         cert.Id,
+		UserId:     cert.UserId,
+		CourseId:   cert.CourseId,
 		UserName:   cert.UserName,
 		CourseName: cert.CourseName,
 		Date:       cert.Date,

@@ -86,8 +86,8 @@ func (c *CourseControllerImpl) GetByKeyword(ctx *gin.Context) {
 	)
 }
 
-func (c *CourseControllerImpl) GetTop3Course(ctx *gin.Context) {
-	courseResponses := c.CourseService.FindTop3Coures()
+func (c *CourseControllerImpl) GetTop4Course(ctx *gin.Context) {
+	courseResponses := c.CourseService.FindTop4Coures()
 	ctx.JSON(http.StatusOK,
 		helper.APIResponse(200, "List of top courses", courseResponses),
 	)
@@ -137,7 +137,9 @@ func (c *CourseControllerImpl) GetExamScore(ctx *gin.Context) {
 
 	examResultResponse := c.CourseService.GetScore(ctx, request)
 
-	ctx.JSON(http.StatusOK, gin.H{"result": examResultResponse})
+	ctx.JSON(200,
+		helper.APIResponse(200, "result", examResultResponse),
+	)
 }
 
 func (c *CourseControllerImpl) EnrollCourse(ctx *gin.Context) {
@@ -152,7 +154,9 @@ func (c *CourseControllerImpl) EnrollCourse(ctx *gin.Context) {
 
 	enrollCourseResponse := c.CourseService.EnrollCourse(request)
 
-	ctx.JSON(http.StatusOK, gin.H{"transaction": enrollCourseResponse})
+	ctx.JSON(200,
+		helper.APIResponse(200, "User enroll course successfull", enrollCourseResponse),
+	)
 }
 
 func (c *CourseControllerImpl) UsersCompletedCourse(ctx *gin.Context) {

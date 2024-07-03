@@ -19,7 +19,7 @@ type CourseService interface {
 	UserEnrolled(userId int, courseId int) domain.UserCourse
 	FindAllCourseIdByUserId(userId int) []web.CourseResponse
 	GetScore(ctx context.Context, request web.ExamRequest) web.ExamResultResponse
-	FindTop3Coures() []web.CourseResponse
+	FindTop4Coures() []web.CourseResponse
 	IsCourseCompletedByUser(userId int, courseId int) (bool, error)
 	EnrollCourse(input web.EnrollCourseInput) web.EnrollCourseResponse
 	CheckUserEnrollment(userId, courseId int) (bool, error)

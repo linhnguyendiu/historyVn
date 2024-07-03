@@ -2,7 +2,7 @@ package controller
 
 import "github.com/gin-gonic/gin"
 
-type CertificateController interface {
+type RewardController interface {
 	Create(ctx *gin.Context)
-	GetById(ctx *gin.Context)
+	GetByUserId(ctx *gin.Context)
 }

@@ -8,4 +8,6 @@ type UserService interface {
 	FindById(userId int) web.UserResponse
 	UploadAvatar(userId int, filePath string) web.UserResponse
 	Logout(userId int) web.UserResponse
+	FindTop10User() []web.UserRankResponse
+	FindDetailById(userId int) web.UserDetailResponse
 }

@@ -56,7 +56,44 @@ func (s *UserServiceImpl) FindById(userId int) web.UserResponse {
 		panic(helper.NewNotFoundError(err.Error()))
 	}
 
-	return helper.ToUserResponse(findById)
+	rankUser, err := s.UserRepository.GetUserRank(findById.Id)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+	findById.Rank = rankUser
+	update := s.UserRepository.Update(findById)
+
+	return helper.ToUserResponse(update)
+}
+
+func (s *UserServiceImpl) FindDetailById(userId int) web.UserDetailResponse {
+	findById, err := s.UserRepository.FindById(userId)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	rankUser, err := s.UserRepository.GetUserRank(findById.Id)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+	findById.Rank = rankUser
+	update := s.UserRepository.Update(findById)
+
+	lastRankUser, err := s.UserRepository.GetLastUserRank()
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	return helper.ToUserDetailResponse(update, lastRankUser)
+}
+
+func (s *UserServiceImpl) FindTop10User() []web.UserRankResponse {
+	findTop10User, err := s.UserRepository.DescBalanceUser(10)
+	if err != nil {
+		panic(helper.NewNotFoundError(err.Error()))
+	}
+
+	return helper.ToUsersRankResponse(findTop10User)
 }
 
 func (s *UserServiceImpl) Login(input web.UserLoginInput) web.UserResponse {

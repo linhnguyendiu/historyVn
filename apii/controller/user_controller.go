@@ -8,4 +8,5 @@ type UserController interface {
 	GetById(ctx *gin.Context)
 	UploadAvatar(ctx *gin.Context)
 	Logout(ctx *gin.Context)
+	GetRanking(ctx *gin.Context)
 }

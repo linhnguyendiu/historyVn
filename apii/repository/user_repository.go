@@ -9,4 +9,7 @@ type UserRepository interface {
 	FindByEmail(email string) (domain.User, error)
 	FindByAddress(address string) (domain.User, error)
 	Delete(userId int)
+	DescBalanceUser(limit int) ([]domain.User, error)
+	GetLastUserRank() (int, error)
+	GetUserRank(userID int) (int, error)
 }
