@@ -190,14 +190,26 @@ contract EduManage {
         uint256 post_id,
         uint256 point
         ) public payable {
-            posts[post_id].point = point;
-            if (point == postPointToReward*(posts[post_id].rewardCount+1)) {
-                rewardToken(posts[post_id].owner, postTokenReward);
-                posts[post_id].rewardCount++;
-            }
-            else {
+            if ( posts[post_id].rewardCount == 0) {
+                if (point/ postPointToReward >= 1 ) {
+                    posts[post_id].point = point;
+                    rewardToken(posts[post_id].owner, postTokenReward*(point/postPointToReward));
+                    posts[post_id].rewardCount++;
+                }
+                else {
                 revert("Sorry, you don't have enough point to take reward token in this post");
             }
+            } 
+            else {
+                if ((point > posts[post_id].point)&&((point-posts[post_id].point)/ postPointToReward >= 1 ) ){
+                    rewardToken(posts[post_id].owner, postTokenReward*(point-posts[post_id].point)/postPointToReward);
+                    posts[post_id].point = point;
+                    posts[post_id].rewardCount++;
+                }
+                else {
+                revert("Sorry, you don't have enough point to take reward token in this post");
+            }
+            }       
     }
 
     function getCourse(uint256 _id) public view returns (Course memory) {

@@ -11,4 +11,8 @@ contract LINKToken is ERC20 {
     _mint(owner, initialSupply * 10 ** decimals());
   }
 
+ function decimals() public view virtual override returns (uint8) {
+        return 8;
+    }
+    
 }
