@@ -16,8 +16,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fogleman/gg"
 	"github.com/go-redis/redis"
+	"github.com/nfnt/resize"
 )
 
 type CourseServiceImpl struct {
@@ -376,6 +381,20 @@ func (s *CourseServiceImpl) EnrollCourse(input web.EnrollCourseInput) web.Enroll
 	return helper.ToEnrollCourseResponse(save)
 }
 
+func waitForTransactionReceipt(client *ethclient.Client, txHash common.Hash) (*types.Receipt, error) {
+	for {
+		receipt, err := client.TransactionReceipt(context.Background(), txHash)
+		if err == ethereum.NotFound {
+			time.Sleep(time.Second)
+			continue
+		} else if err != nil {
+			return nil, err
+		}
+
+		return receipt, nil
+	}
+}
+
 func (s *CourseServiceImpl) GetScore(ctx context.Context, request web.ExamRequest) web.ExamResultResponse {
 	examResult, err := s.ExamResultRepository.FindById(request.UserId, request.CourseId)
 	if err != nil {
@@ -457,7 +476,21 @@ func (s *CourseServiceImpl) GetScore(ctx context.Context, request web.ExamReques
 		if err != nil {
 			helper.PanicIfError(err)
 		}
-		log.Printf("submit grade successfull", add)
+		txHash := add.Hash().Hex()
+		log.Printf("Submit grade transaction hash: %s", txHash)
+
+		// Chờ giao dịch được xác nhận
+		receipt, err := waitForTransactionReceipt(helper.Client, add.Hash())
+		if err != nil {
+			helper.PanicIfError(err)
+		}
+
+		if receipt.Status != 1 {
+			log.Fatalf("Submit grade transaction failed")
+		}
+		log.Printf("Submit grade transaction confirmed")
+
+		// Thực hiện các hàm tiếp theo sau khi submitGrade được xác nhận
 		if examResult.Score > 7 {
 			cert := domain.Certificate{
 				UserName:   findById.LastName,
@@ -466,7 +499,7 @@ func (s *CourseServiceImpl) GetScore(ctx context.Context, request web.ExamReques
 				CertType:   course.Type,
 				ImageUri:   image.ImageAlt,
 			}
-			log.Printf("cert", cert)
+			log.Printf("Certificate: %+v", cert)
 			certificatePDF, err := GenerateCertPDF(cert)
 			if err != nil {
 				panic(helper.NewNotFoundError(err.Error()))
@@ -484,14 +517,16 @@ func (s *CourseServiceImpl) GetScore(ctx context.Context, request web.ExamReques
 			cert.CourseId = examResult.CourseId
 			certificateNFT := s.CertificateRepository.Save(cert)
 
-			log.Printf("cert", certificateNFT)
+			log.Printf("Certificate NFT: %+v", certificateNFT)
 			reward, err := helper.Manage.CheckAndTransferRewardCourse(auth, big.NewInt(int64(examResult.UserId)), big.NewInt(int64(examResult.CourseId)), big.NewInt(int64(certificateNFT.Id)), certificateNFT.ImageUri)
 			if err != nil {
 				helper.PanicIfError(err)
 			}
-			log.Printf("transac reward successfull", reward)
-			txHash := reward.Hash().Hex()
-			examResult.RewardAddress = txHash
+			log.Printf("Transaction reward successful: %v", reward)
+			txHash2 := reward.Hash().Hex()
+			log.Printf("Reward transaction hash: %s", txHash2)
+
+			examResult.RewardAddress = txHash2
 			examResult.CertificateId = certificateNFT.Id
 			findById.Balance = findById.Balance + course.Reward
 
@@ -561,7 +596,6 @@ func (s *CourseServiceImpl) IsCourseCompletedByUser(userId int, courseId int) (b
 }
 
 func GenerateCertPDF(cert domain.Certificate) ([]byte, error) {
-	// Tạo khung ảnh với kích thước cố định
 	const widthPx, heightPx = 1200, 800
 	dc := gg.NewContext(widthPx, heightPx)
 
@@ -576,7 +610,7 @@ func GenerateCertPDF(cert domain.Certificate) ([]byte, error) {
 	}
 	dc.DrawStringAnchored("CHỨNG NHẬN HOÀN THÀNH KHÓA HỌC", widthPx/2, 100, 0.5, 0.5)
 
-	// Vẽ hình ảnh chính
+	// Vẽ hình ảnh chính với kích thước cố định
 	response, err := http.Get(cert.ImageUri)
 	if err != nil {
 		return nil, err
@@ -591,8 +625,10 @@ func GenerateCertPDF(cert domain.Certificate) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	// imgWidth, imgHeight := 300, 450
-	dc.DrawImageAnchored(img, 200, 400, 0.5, 0.5)
+
+	imgWidth, imgHeight := 300, 450
+	resizedImg := resize.Resize(uint(imgWidth), uint(imgHeight), img, resize.Lanczos3)
+	dc.DrawImageAnchored(resizedImg, 200, 400, 0.5, 0.5)
 
 	// Vẽ viền (border) cho phần text
 	borderX := 550.0
@@ -609,14 +645,18 @@ func GenerateCertPDF(cert domain.Certificate) ([]byte, error) {
 	if err := dc.LoadFontFace("assets/font/BeVietnamPro-Black.ttf", 24); err != nil {
 		return nil, err
 	}
-	startX := 700.0
+	startX := 600.0
 	startY := 200.0
 	lineHeight := 40.0
 
-	dc.DrawStringAnchored(cert.UserName, startX, startY, 0, 0.5)
-	dc.DrawStringAnchored(cert.CourseName, startX, startY+lineHeight*2, 0, 0.5)
-	dc.DrawStringAnchored(cert.Date.String(), startX, startY+4*lineHeight, 0, 0.5)
-	dc.DrawStringAnchored(cert.CertType, startX, startY+6*lineHeight, 0, 0.5)
+	dc.DrawStringAnchored("Người nhận:", startX, startY, 0, 0.5)
+	dc.DrawStringAnchored(cert.UserName, startX, startY+lineHeight, 0, 0.5)
+	dc.DrawStringAnchored("Khóa học:", startX, startY+2*lineHeight, 0, 0.5)
+	dc.DrawStringAnchored(cert.CourseName, startX, startY+3*lineHeight, 0, 0.5)
+	dc.DrawStringAnchored("Ngày hoàn thành:", startX, startY+4*lineHeight, 0, 0.5)
+	dc.DrawStringAnchored(cert.Date.Format("02-01-2006"), startX, startY+5*lineHeight, 0, 0.5)
+	dc.DrawStringAnchored("Loại chứng chỉ:", startX, startY+6*lineHeight, 0, 0.5)
+	dc.DrawStringAnchored(cert.CertType, startX, startY+7*lineHeight, 0, 0.5)
 
 	var buf bytes.Buffer
 	err = dc.EncodePNG(&buf)

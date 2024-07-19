@@ -11,6 +11,7 @@ import (
 	"net/http"
 
 	"github.com/fogleman/gg"
+	"github.com/nfnt/resize"
 )
 
 type CertificateServiceImpl struct {
@@ -27,7 +28,7 @@ func (s *CertificateServiceImpl) Create(input web.CertificateCreateInput) web.Ce
 		ImageUri:   input.ImageUri,
 	}
 
-	certificatePDF, err := GenerateCertificatePDF(cert)
+	certificatePDF, err := GenerateCertNFTPDF(cert)
 	if err != nil {
 		panic(helper.NewNotFoundError(err.Error()))
 	}
@@ -50,7 +51,7 @@ func (s *CertificateServiceImpl) Create(input web.CertificateCreateInput) web.Ce
 	return helper.ToCertificateResponse(certificateNFT)
 }
 
-func GenerateCertificatePDF(cert domain.Certificate) ([]byte, error) {
+func GenerateCertNFTPDF(cert domain.Certificate) ([]byte, error) {
 	// Tạo khung ảnh với kích thước cố định
 	const widthPx, heightPx = 1200, 800
 	dc := gg.NewContext(widthPx, heightPx)
@@ -66,7 +67,7 @@ func GenerateCertificatePDF(cert domain.Certificate) ([]byte, error) {
 	}
 	dc.DrawStringAnchored("CHỨNG NHẬN HOÀN THÀNH KHÓA HỌC", widthPx/2, 100, 0.5, 0.5)
 
-	// Vẽ hình ảnh chính
+	// Vẽ hình ảnh chính với kích thước cố định
 	response, err := http.Get(cert.ImageUri)
 	if err != nil {
 		return nil, err
@@ -81,8 +82,10 @@ func GenerateCertificatePDF(cert domain.Certificate) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	// imgWidth, imgHeight := 300, 450
-	dc.DrawImageAnchored(img, 200, 400, 0.5, 0.5)
+
+	imgWidth, imgHeight := 300, 450
+	resizedImg := resize.Resize(uint(imgWidth), uint(imgHeight), img, resize.Lanczos3)
+	dc.DrawImageAnchored(resizedImg, 200, 400, 0.5, 0.5)
 
 	// Vẽ viền (border) cho phần text
 	borderX := 550.0
@@ -99,14 +102,18 @@ func GenerateCertificatePDF(cert domain.Certificate) ([]byte, error) {
 	if err := dc.LoadFontFace("assets/font/BeVietnamPro-Black.ttf", 24); err != nil {
 		return nil, err
 	}
-	startX := 700.0
+	startX := 600.0
 	startY := 200.0
 	lineHeight := 40.0
 
-	dc.DrawStringAnchored(cert.UserName, startX, startY, 0, 0.5)
-	dc.DrawStringAnchored(cert.CourseName, startX, startY+lineHeight*2, 0, 0.5)
-	dc.DrawStringAnchored(cert.Date.String(), startX, startY+4*lineHeight, 0, 0.5)
-	dc.DrawStringAnchored(cert.CertType, startX, startY+6*lineHeight, 0, 0.5)
+	dc.DrawStringAnchored("Người nhận:", startX, startY, 0, 0.5)
+	dc.DrawStringAnchored(cert.UserName, startX, startY+lineHeight, 0, 0.5)
+	dc.DrawStringAnchored("Khóa học:", startX, startY+2*lineHeight, 0, 0.5)
+	dc.DrawStringAnchored(cert.CourseName, startX, startY+3*lineHeight, 0, 0.5)
+	dc.DrawStringAnchored("Ngày hoàn thành:", startX, startY+4*lineHeight, 0, 0.5)
+	dc.DrawStringAnchored(cert.Date.Format("02-01-2006"), startX, startY+5*lineHeight, 0, 0.5)
+	dc.DrawStringAnchored("Loại chứng chỉ:", startX, startY+6*lineHeight, 0, 0.5)
+	dc.DrawStringAnchored(cert.CertType, startX, startY+7*lineHeight, 0, 0.5)
 
 	var buf bytes.Buffer
 	err = dc.EncodePNG(&buf)

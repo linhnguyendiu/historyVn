@@ -7,7 +7,7 @@ type PostCreateInput struct {
 	Description  string `json:"description" binding:"required"`
 	Content      string `json:"content" binding:"required"`
 	Topic        string `json:"topic" binding:"required"`
-	Keyworks     string `json:"key_works" binding:"required"`
+	Keyworks     string `json:"key_works"`
 	CommentReply bool   `json:"comment_reply"`
 }
 

@@ -73,14 +73,14 @@ func (r *UserRepositoryImpl) DescBalanceUser(limit int) ([]domain.User, error) {
 	}
 
 	// Cập nhật rank
-	var currentRank int = 1
-	var sameRankCount int = 0
+	currentRank := 1
+	sameRankCount := 0
 	var currentBalance *int
 
 	for i := range users {
 		if currentBalance == nil || users[i].Balance != *currentBalance {
 			currentRank += sameRankCount
-			sameRankCount = 0
+			sameRankCount = 1
 		} else {
 			sameRankCount++
 		}
@@ -106,7 +106,6 @@ func (r *UserRepositoryImpl) DescBalanceUser(limit int) ([]domain.User, error) {
 	return topRankedUsers, nil
 }
 
-// Hàm tính toán thứ hạng cho tất cả người dùng
 func (r *UserRepositoryImpl) CalculateUserRanks() ([]domain.User, error) {
 	users := []domain.User{}
 	if err := r.db.Table("users").
@@ -115,20 +114,15 @@ func (r *UserRepositoryImpl) CalculateUserRanks() ([]domain.User, error) {
 		return nil, err
 	}
 
-	// Nếu không có người dùng nào
-	if len(users) == 0 {
-		return nil, errors.New("no users found")
-	}
-
 	// Cập nhật rank
-	var currentRank int = 1
-	var sameRankCount int = 0
+	currentRank := 1
+	sameRankCount := 0
 	var currentBalance *int
 
 	for i := range users {
 		if currentBalance == nil || users[i].Balance != *currentBalance {
 			currentRank += sameRankCount
-			sameRankCount = 0
+			sameRankCount = 1
 		} else {
 			sameRankCount++
 		}
@@ -136,7 +130,20 @@ func (r *UserRepositoryImpl) CalculateUserRanks() ([]domain.User, error) {
 		currentBalance = &users[i].Balance
 	}
 
-	return users, nil
+	// Lọc danh sách người dùng theo thứ hạng từ 1 đến limit
+	topRankedUsers := []domain.User{}
+	for _, user := range users {
+		topRankedUsers = append(topRankedUsers, user)
+	}
+
+	// Cập nhật thứ hạng trong database
+	for _, user := range topRankedUsers {
+		if err := r.db.Table("users").Where("id = ?", user.Id).Update("rank", user.Rank).Error; err != nil {
+			return nil, err
+		}
+	}
+
+	return topRankedUsers, nil
 }
 
 // Hàm lấy thứ hạng của một người dùng cụ thể
@@ -160,6 +167,10 @@ func (r *UserRepositoryImpl) GetLastUserRank() (int, error) {
 	users, err := r.CalculateUserRanks()
 	if err != nil {
 		return 0, err
+	}
+
+	if len(users) == 0 {
+		return 0, errors.New("no users found")
 	}
 
 	return users[len(users)-1].Rank, nil

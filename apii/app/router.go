@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -104,7 +103,7 @@ func NewRouter() *gin.Engine {
 	helper.ConnectToLINKToken()
 	helper.ConnectToCertNFT()
 	helper.ConnectToEduManage()
-	auth := helper.AuthGenerator(helper.Client)
+	// auth := helper.AuthGenerator(helper.Client)
 	// token := helper.GetTokenInstance()
 	// manage := helper.GetEduManageInstance()
 
@@ -137,39 +136,44 @@ func NewRouter() *gin.Engine {
 	// Bắt đầu cron scheduler
 	c.Start()
 
-	account := common.HexToAddress("0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0")
-	owner := common.HexToAddress("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266")
-	value := big.NewInt(1000000000000)
+	// account := common.HexToAddress("0x36f290c300a7E19e7f0452d0222186395F400c38")
+	// owner := common.HexToAddress("0x25eaa81E1a3da566e30f51c3e9b6cbC1c0667df2")
+	// value := big.NewInt(1000000000)
 
-	balance, err := helper.Token.BalanceOf(&bind.CallOpts{}, owner)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("Tranfer to contract", balance)
+	// balance, err := helper.Token.BalanceOf(&bind.CallOpts{}, owner)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// log.Println("Tranfer to contract", balance)
 
-	tranfer, err := helper.Token.Transfer(auth, account, value)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("Tranfer to contract", tranfer)
+	// tranfer, err := helper.Manage.BuyCourse(auth, big.NewInt(2), big.NewInt(5))
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// log.Println("Tranfer to contract", tranfer)
 
-	addMinter, err := helper.Cert.AddMinter(auth, account)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("Add minter", addMinter)
+	// tranfer2, err := helper.Manage.CheckAndTransferRewardCourse(auth, big.NewInt(2), big.NewInt(4), big.NewInt(5), "https://drive.google.com/uc?export=view&id=1X18lyE2D9-XyLX1o94sQRQ9C2LPic0Rt")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// log.Println("Tranfer to contract", tranfer2)
 
-	getPost, err := helper.Manage.GetPosts(&bind.CallOpts{}, big.NewInt(9))
+	// addMinter, err := helper.Cert.AddMinter(auth, owner)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// log.Println("Add minter", addMinter)
+
+	getPost, err := helper.Manage.GetGrades(&bind.CallOpts{}, big.NewInt(1), big.NewInt(3))
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Println("getPost", getPost)
-
-	getCourse, err := helper.Manage.GetCourse(&bind.CallOpts{}, big.NewInt(62))
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("getPost", getCourse)
+	// add, err := helper.Manage.BuyCourse(auth, big.NewInt(1), big.NewInt(int64(2)))
+	// if err != nil {
+	// 	helper.PanicIfError(err)
+	// }
+	// log.Printf("buy course successfull", add)
 
 	// User endpoints
 	v1.POST("/users", userController.Register)

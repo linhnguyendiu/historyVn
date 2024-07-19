@@ -58,9 +58,9 @@ func NewContractRepositoryImpl(db *gorm.DB) (*ContractRepositoryImpl, error) {
 		return nil, fmt.Errorf("failed to create authorized transactor: %v", err)
 	}
 
-	linkTokenAddress := common.HexToAddress("0x5fbdb2315678afecb367f032d93f642f64180aa3")
-	certNFTAddress := common.HexToAddress("0xe7f1725e7734ce288f8367e1bb143e90bb3f0512")
-	eduManageAddress := common.HexToAddress("0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0")
+	linkTokenAddress := common.HexToAddress("0x2b21Ed84Ee2f50e232A50969d0f296A62A0cd227")
+	certNFTAddress := common.HexToAddress("0x418A16a6B2853D1E6d12Eb1082871f5006D17E42")
+	eduManageAddress := common.HexToAddress("0xe89e92F656a23c7Df79Edeb63f46BFe6371496d8")
 
 	linkTokenABI, err := loadABI("/home/linh/DATN/thesis/thesis-/apii/smartContract/artifacts/contracts/LINKToken.sol/LINKToken.json")
 	if err != nil {

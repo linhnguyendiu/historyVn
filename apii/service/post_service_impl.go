@@ -246,7 +246,7 @@ func CalculatePoints(likes, dislikes, commCount int) int {
 }
 
 func (s *PostServiceImpl) RewardPost(postId int, point int) {
-	eduManageAddress := common.HexToAddress("0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0")
+	eduManageAddress := common.HexToAddress("0xe89e92F656a23c7Df79Edeb63f46BFe6371496d8")
 	balance1, err := helper.Token.BalanceOf(&bind.CallOpts{}, eduManageAddress)
 	if err != nil {
 		log.Fatal(err)

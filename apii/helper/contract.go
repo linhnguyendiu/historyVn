@@ -20,7 +20,7 @@ var (
 )
 
 func DialClient() *ethclient.Client {
-	client, err := ethclient.Dial("http://localhost:8545")
+	client, err := ethclient.Dial("https://eth-sepolia.g.alchemy.com/v2/LLnypZlAP6s6LsS8ugbapx3S9soRziXM")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,7 +33,7 @@ func DialClient() *ethclient.Client {
 func ConnectToLINKToken() {
 	Client = DialClient()
 	var err error
-	linkTokenAddress := common.HexToAddress("0x5FbDB2315678afecb367f032d93F642f64180aa3")
+	linkTokenAddress := common.HexToAddress("0x33Fe0D80e17bF3aB170Ba57D53Af63fefD316917")
 	Token, err = contracts.NewLINKToken(linkTokenAddress, Client)
 	if err != nil {
 		log.Fatalf("Failed to instantiate a Token contract: %v", err)
@@ -53,7 +53,7 @@ func ConnectToLINKToken() {
 func ConnectToCertNFT() {
 	Client = DialClient()
 	var err error
-	certNFTAddress := common.HexToAddress("0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512")
+	certNFTAddress := common.HexToAddress("0x0A79C71AECcdf0564Ce7b6cFcd8A413C1119575b")
 	Cert, err = contracts.NewCertNFT(certNFTAddress, Client)
 	if err != nil {
 		log.Fatalf("Failed to instantiate a CertNFT contract: %v", err)
@@ -66,7 +66,7 @@ func ConnectToCertNFT() {
 func ConnectToEduManage() {
 	Client = DialClient()
 	var err error
-	eduManageAddress := common.HexToAddress("0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0")
+	eduManageAddress := common.HexToAddress("0x25eaa81E1a3da566e30f51c3e9b6cbC1c0667df2")
 	Manage, err = contracts.NewEduManage(eduManageAddress, Client)
 	if err != nil {
 		log.Fatalf("Failed to instantiate a EduManage contract: %v", err)
@@ -77,13 +77,13 @@ func ConnectToEduManage() {
 }
 
 func AuthGenerator(client *ethclient.Client) *bind.TransactOpts {
-	privateKeyHex := "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+	privateKeyHex := "0xd056eee1f82a146479b40e56d416caed0a1b926103295c081e3ba641bb387e18"
 	privateKey, err := crypto.HexToECDSA(privateKeyHex[2:])
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	auth, err := bind.NewKeyedTransactorWithChainID(privateKey, big.NewInt(31337)) // Hardhat uses chain ID 31337
+	auth, err := bind.NewKeyedTransactorWithChainID(privateKey, big.NewInt(11155111)) // Hardhat uses chain ID 31337
 	if err != nil {
 		log.Fatal(err)
 	}
